@@ -1,0 +1,28 @@
+citation-file-format: 1.2.0
+creator:
+  - family-names: Ren
+    given-names: Donghao
+  - family-names: Hohman
+    given-names: Fred
+  - family-names: Lin
+    given-names: Halden
+  - family-names: Moritz
+    given-names: Dominik
+title: Embedding Atlas
+version: 1.0.0
+url: https://github.com/apple/embedding-atlas
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Ren
+      given-names: Donghao
+    - family-names: Hohman
+      given-names: Fred
+    - family-names: Lin
+      given-names: Halden
+    - family-names: Moritz
+      given-names: Dominik
+  title: "Embedding Atlas: Low-Friction, Interactive Embedding Visualization"
+  year: 2025
+  journal: arXiv
+  url: https://arxiv.org/abs/2505.06386

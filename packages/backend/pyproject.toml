@@ -1,0 +1,73 @@
+[project]
+name = "embedding-atlas"
+version = "0.24.0"
+license = "MIT"
+description = "A tool for visualizing embeddings"
+keywords = ["embedding", "visualization"]
+readme = "README.md"
+authors = [
+  {name = "Donghao Ren", email = "donghao.ren@gmail.com"},
+  {name = "Halden Lin", email = "halden.lin@gmail.com"},
+  {name = "Fred Hohman", email = "fredhohman@apple.com"},
+  {name = "Dominik Moritz", email = "domoritz@gmail.com"},
+]
+requires-python = ">=3.11"
+dependencies = [
+  "click >= 8.0.0",
+  "pandas >= 3.0.0",
+  "platformdirs >= 4.9.0",
+  "umap-learn >= 0.5.0",
+  "sentence-transformers >= 5.0.0",
+  "fastapi >= 0.120.0",
+  "uvicorn >= 0.40.0",
+  'uvloop >= 0.22.0 ; platform_system != "Windows"',
+  "pyarrow >= 24.0.0",
+  "duckdb >= 1.5.0",
+  "inquirer >= 3.0.0",
+  "llvmlite >= 0.47.0",
+  "accelerate >= 1.5.0",
+  "tqdm >= 4.60.0",
+  "litellm >= 1.83.0",
+  "websockets >= 16.0",
+  "cryptography >= 48.0.0",
+  "narwhals >= 2.0.0",
+]
+
+[project.scripts]
+embedding-atlas = "embedding_atlas.cli:main"
+
+[project.urls]
+homepage = "https://apple.github.io/embedding-atlas"
+source = "https://github.com/apple/embedding-atlas"
+
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+artifacts = [
+  "embedding_atlas/static",
+  "embedding_atlas/widget_static"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["embedding_atlas"]
+
+[tool.pytest.ini_options]
+markers = [
+  "external: tests requiring external resources such as models or APIs (skipped unless --run-external is passed)",
+]
+
+[dependency-groups]
+dev = [
+  "datasets >= 4.8.0",
+  "jupyterlab >= 4.5.0",
+  "streamlit >= 1.57.0",
+  "anywidget >= 0.11.0",
+  "docutils >= 0.22.0",
+  "pytest >= 9.0.3",
+  "pytest-asyncio >= 1.3.0",
+  "pyright >= 1.1.400",
+  "soundfile >= 0.13.0",
+  "polars >= 1.40.0",
+]

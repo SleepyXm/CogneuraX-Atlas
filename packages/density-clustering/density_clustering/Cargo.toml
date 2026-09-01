@@ -1,0 +1,18 @@
+[package]
+name = "density_clustering"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+name = "density_clustering"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+num-traits = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+
+[lints]
+workspace = true

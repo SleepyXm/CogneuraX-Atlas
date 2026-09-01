@@ -1,0 +1,124 @@
+/* Copyright (c) 2025 Apple Inc. Licensed under MIT License. */
+
+@import "tailwindcss";
+
+@config "../tailwind.config.js";
+
+@plugin '@tailwindcss/forms' {
+  strategy: "class";
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  :root,
+  :host {
+    --scrollbar-thumb: rgba(0, 0, 0, 0.25);
+
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      Segoe UI,
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      Open Sans,
+      Helvetica Neue,
+      sans-serif;
+    font-size: 13px;
+
+    overscroll-behavior: none;
+  }
+
+  .dark,
+  .dark * {
+    --scrollbar-thumb: rgba(255, 255, 255, 0.25);
+  }
+
+  /* Workaround a tailwind issue that variables are not exported to :host
+   * (https://github.com/tailwindlabs/tailwindcss/discussions/15556#discussioncomment-11955597)
+   */
+  :root,
+  :host {
+    --tw-border-style: solid;
+    --tw-font-weight: initial;
+    --tw-tracking: initial;
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-color: initial;
+    --tw-inset-shadow: 0 0 #0000;
+    --tw-inset-shadow-color: initial;
+    --tw-ring-color: initial;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-inset-ring-color: initial;
+    --tw-inset-ring-shadow: 0 0 #0000;
+    --tw-ring-inset: initial;
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-offset-shadow: 0 0 #0000;
+  }
+}
+
+/* Override the rem units from @tailwindcss/forms */
+.form-input,
+.form-textarea,
+.form-select,
+.form-multiselect {
+  font-size: 13px;
+  line-height: 19.5px;
+}
+
+mark {
+  background-color: #f9ceaf;
+}
+
+.markdown-content {
+  line-height: 1.2em;
+}
+
+.markdown-content a {
+  text-decoration: underline;
+}
+
+.markdown-content pre,
+.markdown-content code {
+  font-family: Menlo, monospace;
+  font-size: 11px;
+}
+
+.markdown-content pre {
+  margin-bottom: 0.5em;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content p {
+  list-style: disc;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ul {
+  list-style: disc;
+  margin-left: 2em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ol {
+  list-style: decimal;
+  margin-left: 2em;
+  margin-bottom: 0.5em;
+}

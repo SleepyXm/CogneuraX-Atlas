@@ -1,0 +1,28 @@
+[package]
+name = "umap-benchmark"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[features]
+default = []
+gpu = ["nndescent/gpu", "umap/gpu"]
+
+[dependencies]
+umap = { path = "../umap" }
+nndescent = { path = "../nndescent" }
+ndarray = { workspace = true }
+
+[[bin]]
+name = "umap-bench"
+path = "src/bin/umap_bench.rs"
+
+[[bin]]
+name = "nndescent-bench"
+path = "src/bin/nndescent_bench.rs"
+
+[lints]
+workspace = true

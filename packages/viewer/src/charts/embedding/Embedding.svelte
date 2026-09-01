@@ -1,0 +1,478 @@
+<!-- Copyright (c) 2025 Apple Inc. Licensed under MIT License. -->
+<script module lang="ts">
+  import { maxDensityModeCategories, type DataPoint, type ViewportState } from "@embedding-atlas/component";
+  import { type Coordinator } from "@uwdata/mosaic-core";
+  import * as SQL from "@uwdata/mosaic-sql";
+
+  import Overlay from "./Overlay.svelte";
+  import Tooltip from "./Tooltip.svelte";
+
+  import { type EmbeddingLegend } from "../../utils/database.js";
+  import { createCustomComponentClass } from "./custom_components.js";
+
+  async function defaultViewportScale(coordinator: Coordinator, table: string, x: string, y: string): Promise<number> {
+    let { stdX, stdY } = (
+      await coordinator.query(
+        SQL.Query.from(table).select({
+          stdX: SQL.sql`STDDEV(${SQL.column(x)})::FLOAT`,
+          stdY: SQL.sql`STDDEV(${SQL.column(y)})::FLOAT`,
+        }),
+      )
+    ).get(0);
+    let scale = 1.0 / (Math.max(stdX, stdY, 1e-3) * 3);
+    return scale;
+  }
+
+  const CustomTooltip = createCustomComponentClass(Tooltip);
+  const CustomOverlay = createCustomComponentClass(Overlay);
+</script>
+
+<script lang="ts">
+  import { EmbeddingViewMosaic } from "@embedding-atlas/component/svelte";
+  import { cubicOut } from "svelte/easing";
+
+  import Button from "../../widgets/Button.svelte";
+  import PopupButton from "../../widgets/PopupButton.svelte";
+  import Select from "../../widgets/Select.svelte";
+  import Slider from "../../widgets/Slider.svelte";
+  import Legend from "./Legend.svelte";
+
+  import { IconSettings } from "../../assets/icons.js";
+  import { isolatedWritable } from "../../utils/store.js";
+  import type { ChartViewProps, RowID } from "../chart.js";
+  import { resolveChartTheme } from "../common/theme.js";
+  import { makeCategoryColumn } from "./category_column.js";
+  import type { EmbeddingSpec, EmbeddingState } from "./types.js";
+  import { interpolateViewport } from "./viewport_animation.js";
+
+  const maxCategories = Math.min(20, maxDensityModeCategories());
+  const defaultMinimumDensity = 1 / 16;
+  const defaultDownsampleMaxPoints = 4000000;
+  const minDownsampleMaxPoints = 50000;
+
+  let {
+    context,
+    width,
+    height,
+    spec,
+    state: chartState,
+    onStateChange,
+    onSpecChange,
+  }: ChartViewProps<EmbeddingSpec, EmbeddingState> = $props();
+
+  // svelte-ignore state_referenced_locally
+  let { colorScheme, columnStyles, searcher, theme: themeConfig } = context;
+
+  let theme = $derived(resolveChartTheme($colorScheme, $themeConfig));
+
+  let dataTable = $derived(spec.data.table ?? context.table);
+  let rowId = $derived(spec.data.id ?? context.id);
+  let filter = $derived(context.filterFor(spec.data.table) ?? context.filter);
+  let isDefaultTable = $derived(dataTable === context.table);
+
+  // svelte-ignore state_referenced_locally
+  let highlightStore = isolatedWritable(context.highlight);
+
+  let categoryColumn = $derived(spec.data.category);
+
+  let categoryLegend: EmbeddingLegend | null = $state.raw(null);
+  let totalPointCount: number | null = $state.raw(null);
+
+  // Query total point count for render limit slider
+  $effect.pre(() => {
+    context.coordinator
+      .query(SQL.Query.from(dataTable).select({ count: SQL.sql`COUNT(*)::INT` }))
+      .then((result: any) => {
+        totalPointCount = result.get(0).count;
+      });
+  });
+
+  let tooltip = $state.raw<DataPoint | null>(null);
+  let selection = $state.raw<DataPoint[] | null>(null);
+  let overlayProps = $state.raw<{ nodes?: DataPoint[]; edges?: { start: DataPoint; end: DataPoint }[] } | null>(null);
+
+  // Update the category mapping and legend.
+  $effect.pre(() => {
+    let promise = context.cache.value(`embedding/category/${dataTable}/${categoryColumn}`, () =>
+      makeCategoryColumn(context.coordinator, dataTable, categoryColumn, theme),
+    );
+    promise.then((v) => {
+      categoryLegend = v;
+      if ((categoryLegend?.legend.length ?? 0) > maxCategories) {
+        onSpecChange((draft) => {
+          draft.mode = "points";
+        });
+      }
+    });
+  });
+
+  $effect.pre(() => {
+    let isOnMount = true;
+    let previousValue: RowID[] | null = null;
+    return highlightStore.subscribe((v) => {
+      if (!isDefaultTable) {
+        return;
+      }
+
+      selection = v;
+
+      // Don't animate immediately on mount.
+      if (isOnMount) {
+        isOnMount = false;
+        previousValue = v;
+        return;
+      }
+      // Animate when a single new point is added.
+      let newIDs = v ?? [];
+      let oldIDs = previousValue ?? [];
+      let enteringIDs = newIDs.filter((x) => oldIDs.indexOf(x) < 0);
+      if (enteringIDs.length == 1) {
+        animateToPoint(enteringIDs[0]);
+      }
+      if (tooltip != null && newIDs.indexOf(tooltip) < 0) {
+        tooltip = null;
+      }
+      previousValue = v;
+    });
+  });
+
+  $effect.pre(() => {
+    return context.overlay.subscribe(async (overlay) => {
+      if (overlay == null) {
+        overlayProps = null;
+        return;
+      }
+      // Collect all ids
+      let ids: RowID[] = [
+        ...(overlay.nodes ?? []), // all nodes
+        ...(overlay.edges?.flatMap((e) => [e.start, e.end]) ?? []), // all points in edges
+      ];
+      // Query for coordinates from ids
+      let queryResult = Array.from(
+        await context.coordinator.query(
+          SQL.Query.from(dataTable)
+            .select({ id: SQL.column(rowId), x: SQL.column(spec.data.x), y: SQL.column(spec.data.y) })
+            .where(
+              SQL.isIn(
+                SQL.column(rowId),
+                ids.map((x) => SQL.literal(x)),
+              ),
+            ),
+        ),
+      );
+      let mapper = new Map(queryResult.map((p) => [p.id, { identifier: p.id, x: p.x, y: p.y }]));
+      overlayProps = {
+        nodes: overlay.nodes?.map((n) => mapper.get(n)).filter((x) => x != undefined),
+        edges: overlay.edges
+          ?.map((n) => {
+            let start = mapper.get(n.start);
+            let end = mapper.get(n.end);
+            if (start == undefined || end == undefined) {
+              return undefined;
+            }
+            return { start, end };
+          })
+          .filter((x) => x != undefined),
+      };
+    });
+  });
+
+  async function animateToPoint(identifier: RowID): Promise<void> {
+    let defaultScale = await context.cache.value(
+      `embedding/default-viewport-scale/${dataTable}/${spec.data.x},${spec.data.y}`,
+      () => defaultViewportScale(context.coordinator, dataTable, spec.data.x, spec.data.y),
+    );
+    let scale = defaultScale * 2;
+    // Query the x, y location.
+    let result = await context.coordinator.query(
+      SQL.Query.from(dataTable)
+        .select({
+          x: SQL.column(spec.data.x),
+          y: SQL.column(spec.data.y),
+        })
+        .where(SQL.eq(SQL.column(rowId), SQL.literal(identifier))),
+    );
+    let { x, y } = result.get(0) as { x: number; y: number };
+    // Start animation and show tooltip.
+    startViewportAnimation({ x: x, y: y, scale: scale });
+    tooltip = identifier;
+  }
+
+  let currentViewportAnimation: number | null;
+  let animatingViewport = $state.raw<ViewportState | undefined>(undefined);
+  function startViewportAnimation(newState: ViewportState) {
+    tooltip = null;
+    let start = animatingViewport ?? chartState.viewport;
+    if (start == null) {
+      onStateChange((draft) => {
+        draft.viewport = newState;
+      });
+      return;
+    }
+    animatingViewport = start;
+    let duration = 800;
+    let t0 = new Date().getTime();
+    let callback = () => {
+      let t = (new Date().getTime() - t0) / duration;
+      if (t > 1) {
+        t = 1;
+      }
+      animatingViewport = interpolateViewport(start, newState, cubicOut(t));
+      if (t < 1) {
+        currentViewportAnimation = requestAnimationFrame(callback);
+      } else {
+        onStateChange((draft) => {
+          draft.viewport = animatingViewport;
+        });
+      }
+    };
+    if (currentViewportAnimation) {
+      cancelAnimationFrame(currentViewportAnimation);
+    }
+    currentViewportAnimation = requestAnimationFrame(callback);
+  }
+
+  async function nearestNeighbors(id: any): Promise<{ id: any; distance: number }[]> {
+    if (spec.data.neighbors == undefined) {
+      return [];
+    }
+    let q = SQL.Query.from(dataTable)
+      .select({ knn: SQL.column(spec.data.neighbors) })
+      .where(SQL.eq(SQL.column(rowId), SQL.literal(id)));
+    let result = await context.coordinator.query(q);
+    let items: any[] = Array.from(result);
+    if (items.length != 1) {
+      return [];
+    }
+    let { distances, ids } = items[0].knn;
+    let r = Array.from(ids)
+      .map((nid, i) => {
+        return { id: nid, distance: distances[i] };
+      })
+      .filter((x) => x.id != id);
+    return r;
+  }
+</script>
+
+<div class="relative bg-white dark:bg-black">
+  <EmbeddingViewMosaic
+    width={width}
+    height={height}
+    coordinator={context.coordinator}
+    table={dataTable}
+    filter={filter}
+    rangeSelection={filter}
+    identifier={rowId}
+    x={spec.data.x}
+    y={spec.data.y}
+    text={spec.data.text}
+    image={spec.data.image}
+    importance={spec.data.importance}
+    category={categoryLegend?.indexColumn}
+    categoryColors={categoryLegend?.legend.map((x) => x.color) ?? [theme.embeddingColor]}
+    theme={{ brandingLink: null }}
+    config={{
+      colorScheme: $colorScheme,
+      ...context.embeddingViewConfig,
+      mode: spec.mode ?? "points",
+      ...(spec.minimumDensity != null ? { minimumDensity: spec.minimumDensity } : {}),
+      ...(spec.pointSize != null ? { pointSize: spec.pointSize } : {}),
+      downsampleMaxPoints: spec.downsampleMaxPoints ?? defaultDownsampleMaxPoints,
+    }}
+    labels={context.embeddingViewLabels}
+    cache={context.persistentCache}
+    additionalFields={isDefaultTable
+      ? Object.fromEntries((context.tables[context.table]?.columns ?? []).map((c) => [c.name, c.name]))
+      : {}}
+    customTooltip={isDefaultTable
+      ? {
+          class: CustomTooltip,
+          props: {
+            context: context,
+            darkMode: $colorScheme,
+            columnStyles: $columnStyles,
+            onNearestNeighborSearch: spec.data.neighbors
+              ? async (id: any) => {
+                  let neighbors = await nearestNeighbors(id);
+                  let nids = neighbors.map((x) => x.id);
+                  searcher.search(
+                    {
+                      label: "Neighbors of #" + id,
+                      items: neighbors,
+                      overlay: {
+                        nodes: [id, ...nids],
+                        edges: nids.map((ni) => ({ start: id, end: ni })),
+                      },
+                    },
+                    "raw",
+                  );
+                }
+              : undefined,
+          },
+        }
+      : undefined}
+    customOverlay={{
+      class: CustomOverlay,
+      props: { ...(overlayProps ?? { nodes: [], edges: [] }) },
+    }}
+    viewportState={animatingViewport ?? chartState.viewport}
+    onViewportState={(v) =>
+      onStateChange((draft) => {
+        draft.viewport = v;
+      })}
+    rangeSelectionValue={chartState.brush}
+    onRangeSelection={(v) =>
+      onStateChange((draft) => {
+        if (v) {
+          draft.brush = v;
+        } else {
+          delete draft.brush;
+        }
+      })}
+    tooltip={tooltip}
+    onTooltip={(v) => {
+      tooltip = v;
+    }}
+    selection={selection}
+    onSelection={(points) => {
+      selection = points;
+      if (isDefaultTable) {
+        highlightStore.set(points?.map((p) => p.identifier) ?? null);
+      }
+    }}
+  />
+  <div class="absolute top-0 left-0 right-0 flex flex-wrap justify-between items-start pointer-events-none">
+    {#if categoryLegend != null}
+      <div
+        class="flex-none m-2 p-2 rounded-md bg-slate-100/75 dark:bg-slate-800/75 backdrop-blur-sm pointer-events-auto order-3"
+      >
+        <Legend
+          context={context}
+          filter={filter}
+          spec={{ items: categoryLegend.legend }}
+          state={chartState.legend ?? {}}
+          mode="view"
+          onSpecChange={() => {}}
+          onStateChange={(update) => {
+            onStateChange((draft) => {
+              if (typeof update == "function") {
+                draft.legend ??= {};
+                update(draft.legend);
+              } else {
+                draft.legend = update;
+              }
+            });
+          }}
+        />
+      </div>
+    {/if}
+    <div
+      class="flex-none p-2 rounded-ee-md bg-white/75 dark:bg-black/75 backdrop-blur-sm flex items-center gap-2 pointer-events-auto order-1"
+    >
+      <Select
+        class="max-w-64"
+        label="Color"
+        value={categoryColumn}
+        onChange={(v) =>
+          onSpecChange((draft) => {
+            draft.data.category = v;
+          })}
+        options={[
+          { value: undefined, label: "--" },
+          ...(context.tables[context.table]?.columns ?? [])
+            .filter((c) => c.jsType == "string" || c.jsType == "number" || c.jsType == "Date")
+            .map((c) => ({ value: c.name, label: `${c.name} (${c.type})` })),
+        ]}
+      />
+      <PopupButton icon={IconSettings} title="Options">
+        <div class="flex flex-col gap-2 w-64">
+          <div class="text-slate-500 dark:text-slate-400 select-none">Display Mode</div>
+          <div class="flex gap-2 items-center">
+            <Select
+              value={spec.mode ?? "points"}
+              onChange={(v) =>
+                onSpecChange((draft) => {
+                  draft.mode = v;
+                })}
+              disabled={categoryLegend != null && categoryLegend.legend.length > maxCategories}
+              options={[
+                { value: "points", label: "Points" },
+                { value: "density", label: "Density" },
+              ]}
+            />
+            {#if (spec.mode ?? "points") == "density"}
+              <Slider
+                bind:value={
+                  () => Math.log((spec.minimumDensity ?? defaultMinimumDensity) / defaultMinimumDensity),
+                  (v) =>
+                    onSpecChange((draft) => {
+                      draft.minimumDensity = defaultMinimumDensity * Math.exp(v);
+                    })
+                }
+                min={-4}
+                max={4}
+                step={0.05}
+              />
+            {/if}
+          </div>
+          <div class="text-slate-500 dark:text-slate-400 select-none">Point Size</div>
+          <div class="flex gap-2 items-center">
+            <Slider
+              bind:value={
+                () => spec.pointSize ?? 1,
+                (v) =>
+                  onSpecChange((draft) => {
+                    draft.pointSize = v;
+                  })
+              }
+              min={1}
+              max={10}
+              step={0.05}
+            />
+            <Button
+              label="Auto"
+              onClick={() =>
+                onSpecChange((draft) => {
+                  delete draft.pointSize;
+                })}
+            />
+          </div>
+          {#if totalPointCount != null && totalPointCount > minDownsampleMaxPoints}
+            {@const effectiveLimit = spec.downsampleMaxPoints ?? Math.min(defaultDownsampleMaxPoints, totalPointCount)}
+            {@const isMaxed = effectiveLimit >= totalPointCount}
+            <div class="text-slate-500 dark:text-slate-400 select-none">
+              Max Points: {isMaxed
+                ? "All"
+                : effectiveLimit >= 1000000
+                  ? (effectiveLimit / 1000000).toFixed(1) + "M"
+                  : (effectiveLimit / 1000).toFixed(0) + "K"}
+              {#if !isMaxed}
+                <span class="text-slate-400 dark:text-slate-500"
+                  >/ {totalPointCount >= 1000000
+                    ? (totalPointCount / 1000000).toFixed(1) + "M"
+                    : (totalPointCount / 1000).toFixed(0) + "K"}</span
+                >
+              {/if}
+            </div>
+            <div class="flex gap-2 items-center">
+              <Slider
+                bind:value={
+                  () =>
+                    spec.downsampleMaxPoints ??
+                    Math.min(defaultDownsampleMaxPoints, totalPointCount ?? defaultDownsampleMaxPoints),
+                  (v) =>
+                    onSpecChange((draft) => {
+                      draft.downsampleMaxPoints = v;
+                    })
+                }
+                min={minDownsampleMaxPoints}
+                max={totalPointCount}
+                step={Math.max(10000, Math.floor(totalPointCount / 100 / 10000) * 10000)}
+              />
+            </div>
+          {/if}
+        </div>
+      </PopupButton>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+{
+  "name": "@embedding-atlas/utils",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build --clean && tsc --build",
+    "package": "npm run build && publint",
+    "test": "vitest run"
+  },
+  "files": [
+    "dist",
+    "vite"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./vite": "./vite/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}
