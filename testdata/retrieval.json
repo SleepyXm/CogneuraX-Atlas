@@ -1,0 +1,45 @@
+{
+  "calibration": {
+    "dense_model": "BAAI/bge-small-en-v1.5",
+    "sparse_model": "Qdrant/bm25",
+    "dense_threshold": 0.55,
+    "sparse_threshold": 5.0,
+    "lowest_relevant_dense": 0.9033,
+    "highest_irrelevant_dense": 0.5460,
+    "lowest_relevant_sparse": 5.1034,
+    "highest_irrelevant_sparse": 3.3931
+  },
+  "documents": [
+    {
+      "id": "project",
+      "profile": "TYPE: Project ownership note\nDOMAIN: Knowledge retrieval\nTOPIC: Atlas retrieval ownership\nPERSON: Alice, retrieval owner\nPERSON: Bob, ingestion maintainer\nDATE: Architecture review on 6 September 2026\nQUESTION: Who owns retrieval?\nQUESTION: When is the architecture review?",
+      "chunks": [
+        "Alice owns retrieval. Bob maintains the document ingestion worker.",
+        "The next architecture review is scheduled for 6 September 2026."
+      ]
+    },
+    {
+      "id": "leave",
+      "profile": "TYPE: Employee handbook\nDOMAIN: Human resources\nTOPIC: Annual leave entitlement\nTOPIC: Leave approval and carry-over\nQUESTION: How many annual leave days do employees receive?",
+      "chunks": [
+        "Full-time employees receive 25 days of annual leave per calendar year.",
+        "Managers must approve leave, and at most five unused days carry into the next year."
+      ]
+    },
+    {
+      "id": "bread",
+      "profile": "TYPE: Recipe\nDOMAIN: Cooking and baking\nTOPIC: Seeded bread loaf\nTOPIC: Proofing and baking time\nQUESTION: How long should I bake the loaf?",
+      "chunks": [
+        "Proof the dough for 60 minutes, until it has roughly doubled in size.",
+        "Bake the loaf at 220 degrees Celsius for 30 minutes."
+      ]
+    }
+  ],
+  "queries": [
+    {"text": "Who owns retrieval?", "document": "project", "chunk": 0},
+    {"text": "When is the architecture review?", "document": "project", "chunk": 1},
+    {"text": "How many annual leave days do employees receive?", "document": "leave", "chunk": 0},
+    {"text": "How long should I bake the loaf?", "document": "bread", "chunk": 1},
+    {"text": "What is the quarterly revenue forecast?", "document": null, "chunk": null}
+  ]
+}

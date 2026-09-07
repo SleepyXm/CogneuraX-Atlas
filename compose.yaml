@@ -1,0 +1,121 @@
+name: cogneurax-atlas
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: atlas
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: atlas
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/001-atlas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas -d atlas"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  embeddings:
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-latest}
+    command: ["--model-id", "${EMBED_MODEL:-BAAI/bge-small-en-v1.5}", "--port", "80"]
+    ports:
+      - "8081:80"
+    volumes:
+      - tei_model_cache:/data
+    restart: unless-stopped
+
+  summary:
+    image: ghcr.io/ggml-org/llama.cpp:server-b9265
+    command:
+      ["-hf", "${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}", "--alias", "${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "${SUMMARY_CONTEXT:-8192}", "--parallel", "1", "--cache-ram", "0", "--reasoning", "off"]
+    ports:
+      - "8082:8080"
+    volumes:
+      - llama_model_cache:/root/.cache
+    restart: unless-stopped
+
+  processor:
+    build: ./processor
+    environment:
+      EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-small-en-v1.5}
+      EMBED_MAX_TOKENS: "${EMBED_MAX_TOKENS:-512}"
+      SUMMARY_URL: http://summary:8080/v1
+      SUMMARY_MODEL: ${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}
+      SUMMARY_TOKENIZER: ${SUMMARY_TOKENIZER:-Qwen/Qwen3-4B}
+      SUMMARY_CONTEXT: "${SUMMARY_CONTEXT:-8192}"
+      SUMMARY_OUTPUT_TOKENS: "${SUMMARY_OUTPUT_TOKENS:-700}"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/openapi.json')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    depends_on:
+      summary:
+        condition: service_healthy
+    volumes:
+      - processor_model_cache:/root/.cache
+    restart: unless-stopped
+
+  data-init:
+    image: busybox:1.37
+    command: ["sh", "-c", "mkdir -p /data/documents && chown -R 65532:65532 /data"]
+    volumes:
+      - atlas_data:/data
+    restart: "no"
+
+  atlas:
+    build: .
+    environment:
+      DATABASE_URL: postgres://atlas:atlas@postgres:5432/atlas?sslmode=disable
+      ATLAS_ADDR: :8090
+      ATLAS_SERVICE_TOKEN: ${ATLAS_SERVICE_TOKEN:-local-development-token}
+      ATLAS_INDEX_VERSION: ${ATLAS_INDEX_VERSION:-v1}
+      ATLAS_PROCESSOR_URL: http://processor:5001
+      ATLAS_STORAGE: local
+      ATLAS_DATA_DIR: /data/documents
+      ATLAS_MAX_UPLOAD_BYTES: ${ATLAS_MAX_UPLOAD_BYTES:-104857600}
+      ATLAS_INGESTION_ATTEMPTS: ${ATLAS_INGESTION_ATTEMPTS:-3}
+      ATLAS_DENSE_THRESHOLD: ${ATLAS_DENSE_THRESHOLD:-0.55}
+      ATLAS_SPARSE_THRESHOLD: ${ATLAS_SPARSE_THRESHOLD:-5.0}
+      QDRANT_HOST: qdrant
+      QDRANT_GRPC_PORT: 6334
+      QDRANT_ROUTE_COLLECTION: ${QDRANT_ROUTE_COLLECTION:-atlas_routes_v1}
+      QDRANT_CHUNK_COLLECTION: ${QDRANT_CHUNK_COLLECTION:-atlas_chunks_v1}
+      TEI_URL: http://embeddings:80
+      TEI_EMBEDDING_DIMENSION: ${TEI_EMBEDDING_DIMENSION:-384}
+      TEI_QUERY_PREFIX: "${TEI_QUERY_PREFIX:-Represent this sentence for searching relevant passages: }"
+    ports:
+      - "8090:8090"
+    volumes:
+      - atlas_data:/data/documents
+    depends_on:
+      data-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      embeddings:
+        condition: service_started
+      processor:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  atlas_data:
+  llama_model_cache:
+  postgres_data:
+  processor_model_cache:
+  qdrant_data:
+  tei_model_cache:

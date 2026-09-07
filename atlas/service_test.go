@@ -1,0 +1,258 @@
+package atlas
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/riverqueue/river"
+	"github.com/riverqueue/river/riverdriver/riverdatabasesql"
+)
+
+type fakeIndex struct {
+	dense, documents          []string
+	scoped, fallback          []Candidate
+	denseLimit                uint64
+	denseWrites, sparseWrites int
+	denseRoutes, activations  int
+	denseError, sparseError   error
+	sparseCalls               int
+}
+
+func (*fakeIndex) PrepareCollections(context.Context) error { return nil }
+func (f *fakeIndex) ReplaceDenseRoutes(_ context.Context, doc indexDocument) error {
+	f.denseWrites++
+	f.denseRoutes = len(doc.Dense)
+	return f.denseError
+}
+func (f *fakeIndex) ReplaceSparseChunks(context.Context, indexDocument) error {
+	f.sparseWrites++
+	return f.sparseError
+}
+func (f *fakeIndex) ActivateDocuments(_ context.Context, _ indexDocument, ids []string) error {
+	f.activations += len(ids)
+	return nil
+}
+func (*fakeIndex) DeleteDocument(context.Context, string, string, string) error { return nil }
+func (f *fakeIndex) SearchDense(_ context.Context, _ retrievalScope, _ []float32, limit uint64) ([]string, error) {
+	f.denseLimit = limit
+	return f.documents, nil
+}
+func (f *fakeIndex) SearchSparse(_ context.Context, _ retrievalScope, _ sparseVector, documents []string, _ uint64) ([]Candidate, error) {
+	f.sparseCalls++
+	if documents == nil {
+		return f.fallback, nil
+	}
+	return f.scoped, nil
+}
+
+type fakeProcessor struct {
+	document  processedDocument
+	routeErr  error
+	sparseErr error
+}
+
+func (f fakeProcessor) RouteDocument(context.Context, string, io.Reader) (processedDocument, error) {
+	return f.document, f.routeErr
+}
+func (f fakeProcessor) SparseDocument(_ context.Context, chunks []processedChunk) ([]processedChunk, error) {
+	for index := range chunks {
+		chunks[index].Sparse = sparseVector{Indices: []uint32{1}, Values: []float32{1}}
+	}
+	return chunks, f.sparseErr
+}
+func (fakeProcessor) SparseQuery(context.Context, string) (sparseVector, error) {
+	return sparseVector{Indices: []uint32{1}, Values: []float32{1}}, nil
+}
+
+type fakeEmbedder struct {
+	vector [][]float32
+	err    error
+}
+
+func (f fakeEmbedder) Embed(_ context.Context, texts []string) ([][]float32, error) {
+	if f.vector == nil {
+		f.vector = make([][]float32, len(texts))
+		for index := range texts {
+			f.vector[index] = []float32{1}
+		}
+	}
+	return f.vector, f.err
+}
+
+type fakeStore struct{ manifest string }
+
+func (fakeStore) Put(context.Context, string, io.Reader, int64) (storedObject, error) {
+	return storedObject{SHA256: strings.Repeat("a", 64), Size: 4}, nil
+}
+func (f fakeStore) Open(_ context.Context, key string) (io.ReadCloser, error) {
+	if strings.HasSuffix(key, ".chunks.json") {
+		return io.NopCloser(strings.NewReader(f.manifest)), nil
+	}
+	return io.NopCloser(strings.NewReader("document")), nil
+}
+func (fakeStore) Delete(context.Context, string) error { return nil }
+
+func TestDocumentUploadStoresMetadataAndRiverJobTogether(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	now := time.Now()
+	collectionID := "00000000-0000-0000-0000-000000000002"
+	mock.ExpectBegin()
+	mock.ExpectQuery("INSERT INTO atlas_documents").WillReturnRows(sqlmock.NewRows([]string{"id", "base", "filename", "mime", "size", "sha", "status", "stage", "failure", "routes", "chunks", "created"}).AddRow("00000000-0000-0000-0000-000000000003", collectionID, "doc.md", "text/markdown", 4, strings.Repeat("a", 64), "queued", "pending", nil, 0, 0, now))
+	mock.ExpectQuery("INSERT INTO .*river_job").WillReturnRows(sqlmock.NewRows([]string{"id", "args", "attempt", "attempted_at", "attempted_by", "created_at", "errors", "finalized_at", "kind", "max_attempts", "metadata", "priority", "queue", "state", "scheduled_at", "tags", "unique_key", "unique_states", "duplicate"}).AddRow(1, `{}`, 0, nil, "{}", now, "{}", nil, ingestionArgs{}.Kind(), 3, `{}`, 1, "default", "available", now, "{}", nil, nil, false))
+	mock.ExpectExec("SELECT pg_notify").WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+	jobs, _ := river.NewClient(riverdatabasesql.New(db), &river.Config{})
+	service := &Service{db: db, store: fakeStore{}, jobs: jobs, serviceToken: "secret", maxAttempts: 3, maxUploadBytes: 100}
+
+	var body bytes.Buffer
+	form := multipart.NewWriter(&body)
+	file, _ := form.CreateFormFile("file", "doc.md")
+	_, _ = file.Write([]byte("data"))
+	_ = form.Close()
+	request := httptest.NewRequest(http.MethodPost, "/v1/collections/"+collectionID+"/documents", &body)
+	request.Header.Set("Content-Type", form.FormDataContentType())
+	request.Header.Set("Authorization", "Bearer secret")
+	request.Header.Set("X-Atlas-Namespace-ID", "00000000-0000-0000-0000-000000000001")
+	response := httptest.NewRecorder()
+	service.Router().ServeHTTP(response, request)
+	if response.Code != http.StatusAccepted {
+		t.Fatalf("upload returned %d: %s", response.Code, response.Body.String())
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDocumentListReturnsOneBoundedPage(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	namespaceID, collectionID := "00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"
+	rows := sqlmock.NewRows([]string{"id", "base", "filename", "mime", "size", "sha", "status", "stage", "failure", "routes", "chunks", "created"})
+	for index := 1; index <= 3; index++ {
+		rows.AddRow(fmt.Sprintf("00000000-0000-0000-0000-%012d", index), collectionID, fmt.Sprintf("%d.md", index), "text/markdown", 4, strings.Repeat("a", 64), "ready", "ready", nil, 2, 1, time.Now())
+	}
+	mock.ExpectQuery("LIMIT \\$3 OFFSET \\$4").WithArgs(namespaceID, collectionID, 3, 5).WillReturnRows(rows)
+	service := &Service{db: db, serviceToken: "secret"}
+	request := httptest.NewRequest(http.MethodGet, "/v1/collections/"+collectionID+"/documents?limit=2&offset=5", nil)
+	request.Header.Set("Authorization", "Bearer secret")
+	request.Header.Set("X-Atlas-Namespace-ID", namespaceID)
+	response := httptest.NewRecorder()
+	service.Router().ServeHTTP(response, request)
+	var page struct {
+		Data       []Document `json:"data"`
+		NextOffset int        `json:"next_offset"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &page); err != nil || response.Code != http.StatusOK || len(page.Data) != 2 || page.NextOffset != 7 {
+		t.Fatalf("unexpected document page: status=%d body=%s err=%v", response.Code, response.Body.String(), err)
+	}
+}
+
+func TestRetrievalCasesStayInsideOneWorkflow(t *testing.T) {
+	namespaceID, collectionID, documentID := "00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002", "00000000-0000-0000-0000-000000000003"
+	candidate := Candidate{Citation: Citation{CitationID: "chunk", DocumentID: documentID}, Text: "answer"}
+	cases := []struct {
+		name             string
+		documents        []string
+		scoped, fallback []Candidate
+		sparseCalls      int
+	}{
+		{"scoped match", []string{documentID}, []Candidate{candidate}, nil, 1},
+		{"scoped miss uses fallback", []string{documentID}, nil, []Candidate{candidate}, 2},
+		{"dense miss uses fallback", nil, nil, []Candidate{candidate}, 1},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			db, mock, _ := sqlmock.New()
+			defer db.Close()
+			mock.ExpectQuery("SELECT b.index_version").WillReturnRows(sqlmock.NewRows([]string{"version", "documents", "chunks"}).AddRow("v1", 3, 8))
+			mock.ExpectQuery("SELECT d.id::text").WillReturnRows(sqlmock.NewRows([]string{"id", "filename"}).AddRow(documentID, "doc.md"))
+			index := &fakeIndex{documents: test.documents, scoped: test.scoped, fallback: test.fallback}
+			service := &Service{db: db, processor: fakeProcessor{}, embedder: fakeEmbedder{}, index: index, indexVersion: "v1", queryPrefix: "query: ", denseThreshold: .55, sparseThreshold: 5}
+			results, err := service.retrieveRelevantChunks(context.Background(), namespaceID, collectionID, "question")
+			if err != nil || len(results) != 1 || index.denseLimit != 3*denseRoutesPerDocument || index.sparseCalls != test.sparseCalls {
+				t.Fatalf("retrieval flow changed: results=%v index=%+v err=%v", results, index, err)
+			}
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestIngestionPassesFailEarly(t *testing.T) {
+	chunk := processedChunk{Text: "chunk"}
+	document := processedDocument{Routes: []processedRoute{{Type: "topic", Text: "Topic: profile"}, {Type: "person", Text: "Person: Alice"}}, Chunks: []processedChunk{chunk}}
+	cases := []struct {
+		name                string
+		processor           fakeProcessor
+		embedder            fakeEmbedder
+		indexError          error
+		wantError           bool
+		expectedDenseWrites int
+	}{
+		{"processor", fakeProcessor{document: document, routeErr: errors.New("processor failed")}, fakeEmbedder{}, nil, true, 0},
+		{"embedding", fakeProcessor{document: document}, fakeEmbedder{err: errors.New("embedding failed")}, nil, true, 0},
+		{"dimension", fakeProcessor{document: document}, fakeEmbedder{vector: [][]float32{{1, 2}}}, nil, true, 0},
+		{"index", fakeProcessor{document: document}, fakeEmbedder{}, errors.New("index failed"), true, 1},
+		{"success", fakeProcessor{document: document}, fakeEmbedder{}, nil, false, 1},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			db, mock, _ := sqlmock.New()
+			defer db.Close()
+			mock.ExpectQuery("UPDATE atlas_documents").WillReturnRows(sqlmock.NewRows([]string{"user", "base", "filename", "key", "version", "stage", "generation"}).AddRow("user", "base", "doc.md", "key", "v1", "pending", 1))
+			if !test.wantError {
+				mock.ExpectBegin()
+				mock.ExpectQuery("SELECT index_generation").WillReturnRows(sqlmock.NewRows([]string{"generation"}).AddRow(1))
+				mock.ExpectExec("UPDATE atlas_documents SET index_stage='dense'").WillReturnResult(sqlmock.NewResult(0, 1))
+				mock.ExpectQuery("SELECT count").WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
+				mock.ExpectCommit()
+			}
+			index := &fakeIndex{denseError: test.indexError}
+			service := &Service{db: db, store: fakeStore{}, processor: test.processor, embedder: test.embedder, index: index, indexVersion: "v1", embeddingDimension: 1}
+			err := (&ingestionWorker{service: service}).Work(context.Background(), &river.Job[ingestionArgs]{Args: ingestionArgs{DocumentID: "doc"}})
+			if (err != nil) != test.wantError || index.denseWrites != test.expectedDenseWrites || (!test.wantError && index.denseRoutes != 2) {
+				t.Fatalf("unexpected pass result: dense_writes=%d err=%v", index.denseWrites, err)
+			}
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestSparseStageActivatesOnlyCompleteGeneration(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	documentID := "00000000-0000-0000-0000-000000000003"
+	manifest, _ := json.Marshal([]processedChunk{{Text: "chunk", ChunkIndex: 0}})
+	mock.ExpectQuery("UPDATE atlas_documents").WillReturnRows(sqlmock.NewRows([]string{"user", "base", "filename", "key", "version", "stage", "generation"}).AddRow("user", "base", "doc.md", "key", "v1", "dense", 1))
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT 1 FROM atlas_collections").WillReturnRows(sqlmock.NewRows([]string{"lock"}).AddRow(1))
+	mock.ExpectExec("UPDATE atlas_documents SET index_stage='sparse'").WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectQuery("SELECT count").WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(0))
+	mock.ExpectQuery("SELECT id::text").WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(documentID))
+	mock.ExpectExec("UPDATE atlas_documents SET status='ready'").WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+	index := &fakeIndex{}
+	service := &Service{db: db, store: fakeStore{manifest: string(manifest)}, processor: fakeProcessor{}, index: index}
+	err := (&ingestionWorker{service: service}).Work(context.Background(), &river.Job[ingestionArgs]{Args: ingestionArgs{DocumentID: documentID, Stage: "sparse"}})
+	if err != nil || index.sparseWrites != 1 || index.activations != 1 {
+		t.Fatalf("unexpected sparse stage: index=%+v err=%v", index, err)
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Fatal(err)
+	}
+}
