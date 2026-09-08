@@ -6,20 +6,20 @@ The user owns architecture and scope. Implement the smallest clear change reques
 
 - `docker compose up --build` must start the complete system.
 - Go owns the public API, namespaces, collections, PostgreSQL state, River jobs, original storage, Qdrant access, and retrieval orchestration.
-- Python owns only Docling HybridChunker, LlamaIndex TreeSummarize, and Qdrant FastEmbed BM25.
+- Python owns only Docling HybridChunker and Qdrant FastEmbed BM25.
 - Qdrant is the only vector and evidence store. PostgreSQL never stores document bodies, chunks, or vectors.
-- Dense inference uses configurable TEI. Routing inference uses configurable llama.cpp. A model change requires a new index version.
+- Dense inference uses configurable TEI. A model change requires a new index version.
 - Apple Embedding Atlas has no runtime role until the user explicitly approves that integration.
 
 ## Indexing invariant
 
-Persist Docling chunks before indexing. Every document in a frozen generation must finish its multiple typed dense routes before any member begins sparse indexing. Every member must finish sparse indexing before that generation is activated. PostgreSQL readiness remains authoritative.
+Persist ordered Docling contextual evidence regions before indexing. Every document in a frozen generation must finish dense indexing of every region before any member begins sparse indexing. Every member must finish sparse indexing before that generation is activated. PostgreSQL readiness remains authoritative.
 
 ## Retrieval invariant
 
-Dense routes gate eligible documents by a calibrated threshold. FastEmbed BM25 searches complete chunks within those documents. Whole-collection sparse fallback is allowed only when scoped search has zero accepted chunks. Do not add fusion, custom ranking, a reranker, dense chunk vectors, or a query-time LLM without an explicit architecture decision.
+Dense search gates every ready evidence region by a calibrated threshold. FastEmbed BM25 searches only those exact admitted region IDs and applies its calibrated threshold. Evidence must pass both stages; an empty dense or scoped sparse result returns no evidence. Do not add a whole-collection fallback, fusion, custom ranking, a reranker, a verifier, or a query-time LLM without an explicit architecture decision.
 
-The existing frozen evaluation exposed a real semantic handoff failure and false-positive fallback. Preserve that evidence. Do not tune thresholds or expected answers against observed holdout results; use a separate development set and then a fresh unseen holdout.
+Preserve the historical document-routing evaluation and the evidence-region evaluation separately. Do not tune thresholds or expected answers against observed holdout results; use a separate development set and then a fresh unseen holdout.
 
 ## Layout
 

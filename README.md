@@ -1,6 +1,6 @@
 # CogneuraX Atlas
 
-CogneuraX Atlas is a self-contained document-indexing and retrieval service. Applications call one Go API; the packaged runtime owns PostgreSQL metadata, Qdrant vectors, dense embeddings, document processing, and ingestion-time routing inference.
+CogneuraX Atlas is a self-contained document-indexing and retrieval service. Applications call one Go API; the packaged runtime owns PostgreSQL metadata, Qdrant vectors, dense embeddings, document processing, and retrieval orchestration.
 
 Apple Embedding Atlas is not a runtime dependency. Visual inspection may be integrated later without changing indexing or retrieval behaviour.
 
@@ -12,7 +12,7 @@ Docker and Docker Compose are the only host requirements.
 docker compose up --build
 ```
 
-The API listens on `http://localhost:8090`. The first start downloads the configured models and is substantially slower than later starts. On Apple Silicon, copy `.env.example` to `.env` and enable its ARM64 TEI image setting.
+The API listens on `http://localhost:8090`. The first start downloads the configured models and is substantially slower than later starts. The Compose default targets Apple Silicon; on x86_64, copy `.env.example` to `.env` and enable its x86 TEI image setting.
 
 Every API request uses a service token and a caller-owned UUID namespace:
 
@@ -49,10 +49,10 @@ curl -X POST http://localhost:8090/v1/retrieve \
 
 ## Pipeline
 
-Each uploaded document joins a collection generation. Docling produces ordered contextual chunks. LlamaIndex and Qwen reduce all of those chunks into separate typed routing facets. TEI embeds the facets. Once every document in the generation has dense routes, FastEmbed creates one Qdrant BM25 sparse vector per complete chunk. A generation becomes searchable only after every member completes both stages.
+Each uploaded document joins a collection generation. Docling produces ordered contextual evidence regions with peer merging disabled and a 128-token default cap. Atlas persists those regions, and TEI embeds every region's contextual source text in batches. Once every document in the frozen generation has its inactive dense regions, FastEmbed creates one paired Qdrant BM25 sparse vector per complete region. A generation becomes searchable only after every member completes both stages.
 
-Retrieval embeds a question once for dense document routing and once for sparse chunk search. It searches sparse evidence inside the eligible documents, then permits a whole-collection sparse fallback only when scoped search returns no accepted chunks. Atlas returns evidence and citations; answer generation belongs to the calling application.
+Retrieval embeds a question once with TEI. Dense Qdrant search admits every ready region at or above the configured threshold, with its limit sized from PostgreSQL's complete ready-region count. FastEmbed then encodes the question for BM25, which searches only those exact region IDs and applies its own threshold. Evidence must pass both stages; an empty dense or scoped BM25 result returns no evidence. Sparse score determines the returned order. Atlas has no whole-collection fallback, Qwen or spaCy router, reranker, verifier, score fusion, or query-time LLM. Answer generation belongs to the calling application.
 
 ## Current accuracy boundary
 
-The first mixed-document evaluation found 75% answer-bearing retrieval and 50% rejection of unanswerable questions. Hardware affects ingestion latency, not this result. The remaining failure is a measured semantic gap between dense document routing and thresholded lexical chunk search. Do not describe the current retriever as production-accurate or tune against the frozen test prompts. Any reranker, dense chunk vectors, score fusion, or query-time model pass is an explicit architecture experiment, not an invisible patch.
+The evidence-region architecture was tested in Synapse on 35 SQuAD articles and 2,290 Docling regions, but that result is not yet a standalone Atlas reproduction. See `V0.1-Metrics.md` for the exact historical and experimental boundaries. Do not describe Atlas as successfully reproduced until its own complete Compose path and frozen evaluation have run, and do not tune against the observed holdout. Any reranker, verifier, fusion, body-only sparse representation, or query-time model pass remains a separate architecture experiment.

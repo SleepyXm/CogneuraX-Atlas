@@ -14,7 +14,7 @@ class Values(list):
 
 
 class ProcessorTest(unittest.TestCase):
-    def test_every_chunk_enters_tree_and_facets_remain_separate(self):
+    def test_every_docling_region_is_returned_in_order(self):
         chunks = [SimpleNamespace(index=i, meta=SimpleNamespace(doc_items=[], headings=[], captions=[])) for i in range(3)]
 
         class Converter:
@@ -25,39 +25,48 @@ class ProcessorTest(unittest.TestCase):
                 return SimpleNamespace(document=object())
 
         class Chunker:
+            class Tokenizer:
+                @staticmethod
+                def count_tokens(text):
+                    return len(text.split())
+
+                @staticmethod
+                def get_max_tokens():
+                    return 2
+
+            tokenizer = Tokenizer()
+
             def chunk(self, _):
                 return iter(chunks)
 
             def contextualize(self, chunk):
                 return f"chunk-{chunk.index}"
 
-        class Tokenizer:
-            def encode(self, text, add_special_tokens=True):
-                return list(range(2))
-
-        class Summarizer:
-            calls = []
-
-            def get_response(self, query_str, text_chunks):
-                self.calls.append(list(text_chunks))
-                return "TOPIC: compact\nTOPIC: compact\nPERSON: Alice"
-
-        summarizer = Summarizer()
-        components = (Converter(), Chunker(), Tokenizer(), summarizer, 512)
+        components = (Converter(), Chunker())
         with patch.object(main, "load_processing_components", return_value=components):
-            result = main.route_document(UploadFile(filename="note.md", file=BytesIO(b"text")))
+            result = main.process_document(UploadFile(filename="note.md", file=BytesIO(b"text")))
 
-        self.assertEqual(summarizer.calls, [["chunk-0", "chunk-1", "chunk-2"]])
-        self.assertEqual(result["routes"], [
-            {"type": "filename", "text": "Filename: note.md"},
-            {"type": "topic", "text": "TOPIC: compact"},
-            {"type": "person", "text": "PERSON: Alice"},
+        self.assertEqual(result["regions"], [
+            {"text": "chunk-0", "page": None, "region_index": 0},
+            {"text": "chunk-1", "page": None, "region_index": 1},
+            {"text": "chunk-2", "page": None, "region_index": 2},
         ])
-        self.assertEqual(len(result["chunks"]), 3)
 
         with patch.object(main, "load_processing_components", return_value=components):
-            main.route_document(UploadFile(filename="requirements.txt", file=BytesIO(b"package>=2,<3")))
+            main.process_document(UploadFile(filename="requirements.txt", file=BytesIO(b"package>=2,<3")))
         self.assertTrue(Converter.paths[-1].endswith(".md"))
+
+    def test_region_over_embedding_limit_is_rejected(self):
+        chunk = SimpleNamespace(meta=SimpleNamespace(doc_items=[]))
+        converter = SimpleNamespace(convert=lambda _: SimpleNamespace(document=object()))
+        chunker = SimpleNamespace(
+            chunk=lambda _: iter([chunk]),
+            contextualize=lambda chunk: "one two three",
+            tokenizer=SimpleNamespace(count_tokens=lambda text: len(text.split()), get_max_tokens=lambda: 2),
+        )
+        with patch.object(main, "load_processing_components", return_value=(converter, chunker)):
+            with self.assertRaisesRegex(ValueError, "embedding token limit"):
+                main.process_document(UploadFile(filename="note.md", file=BytesIO(b"text")))
 
 
 if __name__ == "__main__":

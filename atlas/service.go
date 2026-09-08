@@ -71,14 +71,14 @@ func NewService(cfg Config, db *sql.DB) (*Service, error) {
 
 	s := &Service{
 		db: db, store: store, serviceToken: cfg.ServiceToken,
-		indexVersion: env("ATLAS_INDEX_VERSION", "v1"), queryPrefix: env("TEI_QUERY_PREFIX", "Represent this sentence for searching relevant passages: "),
+		indexVersion: env("ATLAS_INDEX_VERSION", "v2"), queryPrefix: env("TEI_QUERY_PREFIX", "Represent this sentence for searching relevant passages: "),
 		embeddingDimension: dimension, maxAttempts: attempts, maxUploadBytes: int64(uploadLimit),
 		denseThreshold: denseThreshold, sparseThreshold: sparseThreshold,
 	}
 	modelHTTP := &http.Client{Timeout: 30 * time.Minute}
 	s.processor = &processorClient{modelClient{url: env("ATLAS_PROCESSOR_URL", "http://localhost:5001"), name: "processor", http: modelHTTP}}
 	s.embedder = &teiClient{modelClient{url: env("TEI_URL", "http://localhost:8081"), name: "TEI", http: modelHTTP}}
-	s.index = &qdrantIndex{client: client, denseCollection: env("QDRANT_ROUTE_COLLECTION", "atlas_routes_v1"), sparseCollection: env("QDRANT_CHUNK_COLLECTION", "atlas_chunks_v1"), embeddingDimension: dimension}
+	s.index = &qdrantIndex{client: client, denseCollection: env("QDRANT_DENSE_COLLECTION", "atlas_dense_regions_v2"), sparseCollection: env("QDRANT_SPARSE_COLLECTION", "atlas_sparse_regions_v2"), embeddingDimension: dimension}
 	workers := river.NewWorkers()
 	river.AddWorker(workers, &ingestionWorker{service: s})
 	s.jobs, err = river.NewClient(riverdatabasesql.New(db), &river.Config{JobTimeout: 30 * time.Minute, Queues: map[string]river.QueueConfig{river.QueueDefault: {MaxWorkers: 1}}, Workers: workers, ErrorHandler: &ingestionErrorHandler{db: db}})
@@ -202,7 +202,7 @@ func (s *Service) listDocuments(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "limit must be 1-50 and offset must be positive"})
 		return
 	}
-	rows, err := s.db.QueryContext(c, `SELECT d.id::text,d.collection_id::text,d.filename,d.mime_type,d.size_bytes,d.sha256,d.status,d.index_stage,d.failure_reason,d.route_count,d.chunk_count,d.created_at FROM atlas_documents d JOIN atlas_collections b ON b.id=d.collection_id WHERE b.namespace_id=$1::uuid AND b.id=$2::uuid ORDER BY d.created_at DESC LIMIT $3 OFFSET $4`, namespaceID, collectionID, limit+1, offset)
+	rows, err := s.db.QueryContext(c, `SELECT d.id::text,d.collection_id::text,d.filename,d.mime_type,d.size_bytes,d.sha256,d.status,d.index_stage,d.failure_reason,d.chunk_count,d.created_at FROM atlas_documents d JOIN atlas_collections b ON b.id=d.collection_id WHERE b.namespace_id=$1::uuid AND b.id=$2::uuid ORDER BY d.created_at DESC LIMIT $3 OFFSET $4`, namespaceID, collectionID, limit+1, offset)
 	if err != nil {
 		s.writeError(c, err)
 		return
@@ -211,7 +211,7 @@ func (s *Service) listDocuments(c *gin.Context) {
 	items := []Document{}
 	for rows.Next() {
 		var item Document
-		if err := rows.Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.RouteCount, &item.ChunkCount, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.ChunkCount, &item.CreatedAt); err != nil {
 			s.writeError(c, err)
 			return
 		}
@@ -274,9 +274,9 @@ func (s *Service) uploadDocument(c *gin.Context) {
 	}
 	defer tx.Rollback()
 	var item Document
-	err = tx.QueryRowContext(c, `WITH base AS (SELECT id,index_generation FROM atlas_collections WHERE id=$2::uuid AND namespace_id=$8::uuid FOR UPDATE) INSERT INTO atlas_documents(id,collection_id,filename,mime_type,size_bytes,sha256,storage_key,status,index_generation) SELECT $1::uuid,base.id,$3,$4,$5,$6,$7,'queued',base.index_generation FROM base ON CONFLICT(collection_id,sha256) DO NOTHING RETURNING id::text,collection_id::text,filename,mime_type,size_bytes,sha256,status,index_stage,failure_reason,route_count,chunk_count,created_at`, documentID, collectionID, name, header.Header.Get("Content-Type"), stored.Size, stored.SHA256, storageKey, namespaceID).Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.RouteCount, &item.ChunkCount, &item.CreatedAt)
+	err = tx.QueryRowContext(c, `WITH base AS (SELECT id,index_generation FROM atlas_collections WHERE id=$2::uuid AND namespace_id=$8::uuid FOR UPDATE) INSERT INTO atlas_documents(id,collection_id,filename,mime_type,size_bytes,sha256,storage_key,status,index_generation) SELECT $1::uuid,base.id,$3,$4,$5,$6,$7,'queued',base.index_generation FROM base ON CONFLICT(collection_id,sha256) DO NOTHING RETURNING id::text,collection_id::text,filename,mime_type,size_bytes,sha256,status,index_stage,failure_reason,chunk_count,created_at`, documentID, collectionID, name, header.Header.Get("Content-Type"), stored.Size, stored.SHA256, storageKey, namespaceID).Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.ChunkCount, &item.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = tx.QueryRowContext(c, `SELECT d.id::text,d.collection_id::text,d.filename,d.mime_type,d.size_bytes,d.sha256,d.status,d.index_stage,d.failure_reason,d.route_count,d.chunk_count,d.created_at FROM atlas_documents d JOIN atlas_collections b ON b.id=d.collection_id WHERE b.namespace_id=$1::uuid AND d.collection_id=$2::uuid AND d.sha256=$3`, namespaceID, collectionID, stored.SHA256).Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.RouteCount, &item.ChunkCount, &item.CreatedAt)
+		err = tx.QueryRowContext(c, `SELECT d.id::text,d.collection_id::text,d.filename,d.mime_type,d.size_bytes,d.sha256,d.status,d.index_stage,d.failure_reason,d.chunk_count,d.created_at FROM atlas_documents d JOIN atlas_collections b ON b.id=d.collection_id WHERE b.namespace_id=$1::uuid AND d.collection_id=$2::uuid AND d.sha256=$3`, namespaceID, collectionID, stored.SHA256).Scan(&item.ID, &item.CollectionID, &item.Filename, &item.MimeType, &item.SizeBytes, &item.SHA256, &item.Status, &item.IndexStage, &item.FailureReason, &item.ChunkCount, &item.CreatedAt)
 		if err == nil {
 			err = tx.Commit()
 		}
@@ -292,7 +292,7 @@ func (s *Service) uploadDocument(c *gin.Context) {
 		return
 	}
 	if err == nil {
-		_, err = s.jobs.InsertTx(c, tx, ingestionArgs{DocumentID: documentID, Stage: "dense"}, &river.InsertOpts{MaxAttempts: s.maxAttempts, UniqueOpts: river.UniqueOpts{ByArgs: true}})
+		_, err = s.jobs.InsertTx(c, tx, ingestionArgs{DocumentID: documentID, Stage: "dense", IndexVersion: s.indexVersion}, &river.InsertOpts{MaxAttempts: s.maxAttempts, UniqueOpts: river.UniqueOpts{ByArgs: true}})
 	}
 	if err == nil {
 		err = tx.Commit()
@@ -318,7 +318,7 @@ func (s *Service) deleteDocument(c *gin.Context) {
 	var storageKey string
 	err := s.db.QueryRowContext(c, `UPDATE atlas_documents d SET status='failed',failure_reason='deletion cleanup pending',updated_at=now() FROM atlas_collections b WHERE d.id=$1::uuid AND d.collection_id=$2::uuid AND b.id=d.collection_id AND b.namespace_id=$3::uuid RETURNING d.storage_key`, documentID, collectionID, namespaceID).Scan(&storageKey)
 	if err == nil {
-		err = errors.Join(s.index.DeleteDocument(c, namespaceID, collectionID, documentID), s.store.Delete(c, storageKey), s.store.Delete(c, chunkManifestKey(storageKey)))
+		err = errors.Join(s.index.DeleteDocument(c, namespaceID, collectionID, documentID), s.store.Delete(c, storageKey), s.store.Delete(c, regionManifestKey(storageKey)), s.store.Delete(c, legacyChunkManifestKey(storageKey)))
 	}
 	if err == nil {
 		_, err = s.db.ExecContext(c, `DELETE FROM atlas_documents WHERE id=$1::uuid AND collection_id=$2::uuid`, documentID, collectionID)
@@ -343,7 +343,7 @@ func (s *Service) handleRetrieve(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid collection_id"})
 		return
 	}
-	items, err := s.retrieveRelevantChunks(c, c.GetString("namespaceID"), input.CollectionID, input.Query)
+	items, err := s.retrieveEvidenceRegions(c, c.GetString("namespaceID"), input.CollectionID, input.Query)
 	if err != nil {
 		s.writeError(c, err)
 		return

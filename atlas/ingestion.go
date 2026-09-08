@@ -23,11 +23,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const qdrantBatchSize, denseRoutesPerDocument = 128, 32
+const (
+	embeddingBatchSize = 8
+	qdrantBatchSize    = 128
+)
 
 func (ingestionArgs) Kind() string { return "atlas_document_ingestion" }
 
 func (w *ingestionWorker) Work(ctx context.Context, job *river.Job[ingestionArgs]) error {
+	if job.Args.IndexVersion != "" && job.Args.IndexVersion != w.service.indexVersion {
+		return nil
+	}
 	stage := job.Args.Stage
 	if stage == "" {
 		stage = "dense"
@@ -68,47 +74,49 @@ func (w *ingestionWorker) runDenseStage(ctx context.Context, documentID string) 
 	if err != nil {
 		return fmt.Errorf("open original for document %s: %w", documentID, err)
 	}
-	processed, processErr := s.processor.RouteDocument(ctx, doc.Filename, original)
+	regions, processErr := s.processor.ProcessDocument(ctx, doc.Filename, original)
 	closeErr := original.Close()
 	if processErr != nil {
-		return fmt.Errorf("route document %s: %w", documentID, processErr)
+		return fmt.Errorf("process evidence regions for document %s: %w", documentID, processErr)
 	}
 	if closeErr != nil {
 		return fmt.Errorf("close original for document %s: %w", documentID, closeErr)
 	}
-	if len(processed.Routes) == 0 || len(processed.Chunks) == 0 {
-		return fmt.Errorf("processor returned no routes or chunks for document %s", documentID)
+	if len(regions) == 0 {
+		return fmt.Errorf("processor returned no evidence regions for document %s", documentID)
 	}
-	routeTexts := make([]string, len(processed.Routes))
-	for index := range processed.Routes {
-		routeTexts[index] = processed.Routes[index].Text
-	}
-	dense, err := s.embedder.Embed(ctx, routeTexts)
+	doc.DocumentID, doc.Regions = documentID, regions
+	manifest, err := json.Marshal(regions)
 	if err != nil {
-		return fmt.Errorf("embed routes for document %s: %w", documentID, err)
+		return fmt.Errorf("encode region manifest for document %s: %w", documentID, err)
 	}
-	if len(dense) != len(processed.Routes) {
-		return fmt.Errorf("TEI returned %d routes for document %s, expected %d", len(dense), documentID, len(processed.Routes))
+	manifestKey := regionManifestKey(storageKey)
+	if err := s.store.Delete(ctx, manifestKey); err != nil {
+		return fmt.Errorf("replace region manifest for document %s: %w", documentID, err)
+	}
+	if _, err := s.store.Put(ctx, manifestKey, bytes.NewReader(manifest), s.maxUploadBytes); err != nil {
+		return fmt.Errorf("store region manifest for document %s: %w", documentID, err)
+	}
+
+	regionTexts := make([]string, len(regions))
+	for index := range regions {
+		regionTexts[index] = regions[index].Text
+	}
+	dense, err := s.embedder.Embed(ctx, regionTexts)
+	if err != nil {
+		return fmt.Errorf("embed evidence regions for document %s: %w", documentID, err)
+	}
+	if len(dense) != len(regions) {
+		return fmt.Errorf("TEI returned %d regions for document %s, expected %d", len(dense), documentID, len(regions))
 	}
 	for _, vector := range dense {
 		if len(vector) != s.embeddingDimension {
-			return fmt.Errorf("route embedding for document %s has %d dimensions, expected %d", documentID, len(vector), s.embeddingDimension)
+			return fmt.Errorf("region embedding for document %s has %d dimensions, expected %d", documentID, len(vector), s.embeddingDimension)
 		}
 	}
-	doc.DocumentID, doc.Routes, doc.Dense, doc.Chunks = documentID, processed.Routes, dense, processed.Chunks
-	manifest, err := json.Marshal(processed.Chunks)
-	if err != nil {
-		return fmt.Errorf("encode chunk manifest for document %s: %w", documentID, err)
-	}
-	manifestKey := chunkManifestKey(storageKey)
-	if err := s.store.Delete(ctx, manifestKey); err != nil {
-		return fmt.Errorf("replace chunk manifest for document %s: %w", documentID, err)
-	}
-	if _, err := s.store.Put(ctx, manifestKey, bytes.NewReader(manifest), s.maxUploadBytes); err != nil {
-		return fmt.Errorf("store chunk manifest for document %s: %w", documentID, err)
-	}
-	if err := s.index.ReplaceDenseRoutes(ctx, doc); err != nil {
-		return fmt.Errorf("replace dense routes for document %s: %w", documentID, err)
+	doc.Dense = dense
+	if err := s.index.ReplaceDenseRegions(ctx, doc); err != nil {
+		return fmt.Errorf("replace dense regions for document %s: %w", documentID, err)
 	}
 	return w.completeDenseAndQueueSparse(ctx, doc, generation)
 }
@@ -124,7 +132,7 @@ func (w *ingestionWorker) completeDenseAndQueueSparse(ctx context.Context, doc i
 	var openGeneration int64
 	err = tx.QueryRowContext(ctx, `SELECT index_generation FROM atlas_collections WHERE id=$1::uuid FOR UPDATE`, doc.CollectionID).Scan(&openGeneration)
 	if err == nil {
-		_, err = tx.ExecContext(ctx, `UPDATE atlas_documents SET index_stage='dense',route_count=$2,chunk_count=$3,updated_at=now() WHERE id=$1::uuid AND index_stage='pending'`, doc.DocumentID, len(doc.Routes), len(doc.Chunks))
+		_, err = tx.ExecContext(ctx, `UPDATE atlas_documents SET index_stage='dense',chunk_count=$2,updated_at=now() WHERE id=$1::uuid AND index_stage='pending'`, doc.DocumentID, len(doc.Regions))
 	}
 	var pending int
 	if err == nil {
@@ -151,7 +159,7 @@ func (w *ingestionWorker) completeDenseAndQueueSparse(ctx context.Context, doc i
 			if err != nil {
 				break
 			}
-			_, err = s.jobs.InsertTx(ctx, tx, ingestionArgs{DocumentID: id, Stage: "sparse"}, &river.InsertOpts{MaxAttempts: s.maxAttempts, UniqueOpts: river.UniqueOpts{ByArgs: true}})
+			_, err = s.jobs.InsertTx(ctx, tx, ingestionArgs{DocumentID: id, Stage: "sparse", IndexVersion: doc.IndexVersion}, &river.InsertOpts{MaxAttempts: s.maxAttempts, UniqueOpts: river.UniqueOpts{ByArgs: true}})
 		}
 	}
 	if err == nil {
@@ -175,22 +183,22 @@ func (w *ingestionWorker) runSparseStage(ctx context.Context, documentID string)
 	if err != nil {
 		return fmt.Errorf("claim sparse stage for document %s: %w", documentID, err)
 	}
-	manifest, err := s.store.Open(ctx, chunkManifestKey(storageKey))
+	manifest, err := s.store.Open(ctx, regionManifestKey(storageKey))
 	if err != nil {
-		return fmt.Errorf("open chunk manifest for document %s: %w", documentID, err)
+		return fmt.Errorf("open region manifest for document %s: %w", documentID, err)
 	}
-	decodeErr := json.NewDecoder(manifest).Decode(&doc.Chunks)
+	decodeErr := json.NewDecoder(manifest).Decode(&doc.Regions)
 	closeErr := manifest.Close()
 	if err = errors.Join(decodeErr, closeErr); err != nil {
-		return fmt.Errorf("read chunk manifest for document %s: %w", documentID, err)
+		return fmt.Errorf("read region manifest for document %s: %w", documentID, err)
 	}
-	doc.Chunks, err = s.processor.SparseDocument(ctx, doc.Chunks)
+	doc.Regions, err = s.processor.SparseDocument(ctx, doc.Regions)
 	if err != nil {
 		return fmt.Errorf("sparsify document %s: %w", documentID, err)
 	}
 	doc.DocumentID = documentID
-	if err = s.index.ReplaceSparseChunks(ctx, doc); err != nil {
-		return fmt.Errorf("replace sparse chunks for document %s: %w", documentID, err)
+	if err = s.index.ReplaceSparseRegions(ctx, doc); err != nil {
+		return fmt.Errorf("replace sparse regions for document %s: %w", documentID, err)
 	}
 	return w.completeSparseAndActivateGeneration(ctx, doc, generation)
 }
@@ -241,7 +249,9 @@ func (w *ingestionWorker) completeSparseAndActivateGeneration(ctx context.Contex
 	return nil
 }
 
-func chunkManifestKey(storageKey string) string { return storageKey + ".chunks.json" }
+func regionManifestKey(storageKey string) string { return storageKey + ".regions.json" }
+
+func legacyChunkManifestKey(storageKey string) string { return storageKey + ".chunks.json" }
 
 func (h *ingestionErrorHandler) HandleError(ctx context.Context, job *rivertype.JobRow, workErr error) *river.ErrorHandlerResult {
 	if job.Kind == (ingestionArgs{}).Kind() && job.Attempt >= job.MaxAttempts {
@@ -268,14 +278,14 @@ func (h *ingestionErrorHandler) markFailed(ctx context.Context, job *rivertype.J
 	}
 }
 
-func (p *processorClient) RouteDocument(ctx context.Context, filename string, src io.Reader) (processedDocument, error) {
+func (p *processorClient) ProcessDocument(ctx context.Context, filename string, src io.Reader) ([]processedRegion, error) {
 	reader, writer := io.Pipe()
 	multipartWriter := multipart.NewWriter(writer)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, strings.TrimRight(p.url, "/")+"/route", reader)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, strings.TrimRight(p.url, "/")+"/process", reader)
 	if err != nil {
 		_ = reader.Close()
 		_ = writer.Close()
-		return processedDocument{}, err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 	go func() {
@@ -288,16 +298,19 @@ func (p *processorClient) RouteDocument(ctx context.Context, filename string, sr
 		}
 		_ = writer.CloseWithError(err)
 	}()
-	var response processedDocument
-	return response, p.sendAndDecode(req, &response)
+	var response struct {
+		Regions []processedRegion `json:"regions"`
+	}
+	err = p.sendAndDecode(req, &response)
+	return response.Regions, err
 }
 
-func (p *processorClient) SparseDocument(ctx context.Context, chunks []processedChunk) ([]processedChunk, error) {
+func (p *processorClient) SparseDocument(ctx context.Context, regions []processedRegion) ([]processedRegion, error) {
 	var response struct {
-		Chunks []processedChunk `json:"chunks"`
+		Regions []processedRegion `json:"regions"`
 	}
-	err := p.postJSON(ctx, "/sparse-document", map[string]any{"chunks": chunks}, &response)
-	return response.Chunks, err
+	err := p.postJSON(ctx, "/sparse-document", map[string]any{"regions": regions}, &response)
+	return response.Regions, err
 }
 
 func (c modelClient) postJSON(ctx context.Context, path string, payload, target any) error {
@@ -327,12 +340,17 @@ func (c modelClient) sendAndDecode(req *http.Request, target any) error {
 }
 
 func (t *teiClient) Embed(ctx context.Context, texts []string) ([][]float32, error) {
-	var vectors [][]float32
-	if err := t.postJSON(ctx, "/embed", map[string]any{"inputs": texts, "truncate": false}, &vectors); err != nil {
-		return nil, err
-	}
-	if len(vectors) != len(texts) {
-		return nil, fmt.Errorf("TEI returned %d embeddings, expected %d", len(vectors), len(texts))
+	vectors := make([][]float32, 0, len(texts))
+	for start := 0; start < len(texts); start += embeddingBatchSize {
+		end := min(start+embeddingBatchSize, len(texts))
+		var batch [][]float32
+		if err := t.postJSON(ctx, "/embed", map[string]any{"inputs": texts[start:end], "truncate": false}, &batch); err != nil {
+			return nil, err
+		}
+		if len(batch) != end-start {
+			return nil, fmt.Errorf("TEI returned %d embeddings for batch %d-%d, expected %d", len(batch), start, end, end-start)
+		}
+		vectors = append(vectors, batch...)
 	}
 	return vectors, nil
 }
@@ -366,7 +384,7 @@ func (q *qdrantIndex) ensureCollection(ctx context.Context, name string, sparse 
 		kind qdrant.FieldType
 	}{
 		{"namespace_id", qdrant.FieldType_FieldTypeKeyword}, {"collection_id", qdrant.FieldType_FieldTypeKeyword},
-		{"document_id", qdrant.FieldType_FieldTypeKeyword}, {"index_version", qdrant.FieldType_FieldTypeKeyword}, {"active", qdrant.FieldType_FieldTypeBool},
+		{"document_id", qdrant.FieldType_FieldTypeKeyword}, {"region_id", qdrant.FieldType_FieldTypeKeyword}, {"index_version", qdrant.FieldType_FieldTypeKeyword}, {"active", qdrant.FieldType_FieldTypeBool},
 	} {
 		_, err := q.client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{CollectionName: name, FieldName: field.name, FieldType: field.kind.Enum(), Wait: &wait})
 		if err != nil && status.Code(err) != codes.AlreadyExists {
@@ -376,51 +394,58 @@ func (q *qdrantIndex) ensureCollection(ctx context.Context, name string, sparse 
 	return nil
 }
 
-func (q *qdrantIndex) ReplaceDenseRoutes(ctx context.Context, doc indexDocument) error {
-	if len(doc.Routes) != len(doc.Dense) {
-		return fmt.Errorf("dense routes and vectors differ")
+func (q *qdrantIndex) ReplaceDenseRegions(ctx context.Context, doc indexDocument) error {
+	if len(doc.Regions) != len(doc.Dense) {
+		return fmt.Errorf("dense regions and vectors differ")
 	}
 	basePayload := documentPayload(doc)
-	densePoints := make([]*qdrant.PointStruct, len(doc.Routes))
-	for index, route := range doc.Routes {
+	densePoints := make([]*qdrant.PointStruct, len(doc.Regions))
+	for index, region := range doc.Regions {
 		payload := copyPayload(basePayload)
-		payload["filename"], payload["facet_type"], payload["facet_text"] = doc.Filename, route.Type, route.Text
+		pointID := deterministicPointID(doc.IndexVersion, doc.DocumentID, region.RegionIndex)
+		payload["region_id"], payload["region_index"] = pointID.GetUuid(), region.RegionIndex
+		if region.Page != nil {
+			payload["page"] = *region.Page
+		}
 		values, err := qdrant.TryValueMap(payload)
 		if err != nil {
-			return fmt.Errorf("encode dense route %d: %w", index, err)
+			return fmt.Errorf("encode dense region %d: %w", index, err)
 		}
-		densePoints[index] = &qdrant.PointStruct{Id: deterministicPointID(doc.IndexVersion, doc.DocumentID, -index-1), Vectors: qdrant.NewVectorsDense(doc.Dense[index]), Payload: values}
+		densePoints[index] = &qdrant.PointStruct{Id: pointID, Vectors: qdrant.NewVectorsDense(doc.Dense[index]), Payload: values}
 	}
-	// A dense retry starts the document index again, so stale chunks from an
+	// A dense retry starts the document index again, so stale regions from an
 	// earlier attempt cannot survive a shorter Docling result.
 	if err := q.DeleteDocument(ctx, doc.NamespaceID, doc.CollectionID, doc.DocumentID); err != nil {
 		return err
 	}
 	wait := true
-	_, err := q.client.Upsert(ctx, &qdrant.UpsertPoints{CollectionName: q.denseCollection, Wait: &wait, Points: densePoints})
-	if err != nil {
-		return fmt.Errorf("write inactive dense routes: %w", err)
+	for start := 0; start < len(densePoints); start += qdrantBatchSize {
+		end := min(start+qdrantBatchSize, len(densePoints))
+		if _, err := q.client.Upsert(ctx, &qdrant.UpsertPoints{CollectionName: q.denseCollection, Wait: &wait, Points: densePoints[start:end]}); err != nil {
+			return fmt.Errorf("write inactive dense region batch %d-%d: %w", start, end, err)
+		}
 	}
 	return nil
 }
 
-func (q *qdrantIndex) ReplaceSparseChunks(ctx context.Context, doc indexDocument) error {
+func (q *qdrantIndex) ReplaceSparseRegions(ctx context.Context, doc indexDocument) error {
 	basePayload := documentPayload(doc)
-	points := make([]*qdrant.PointStruct, 0, len(doc.Chunks))
-	for _, chunk := range doc.Chunks {
-		if len(chunk.Sparse.Indices) == 0 || len(chunk.Sparse.Indices) != len(chunk.Sparse.Values) {
-			return fmt.Errorf("chunk %d has an invalid sparse vector", chunk.ChunkIndex)
+	points := make([]*qdrant.PointStruct, 0, len(doc.Regions))
+	for _, region := range doc.Regions {
+		if len(region.Sparse.Indices) == 0 || len(region.Sparse.Indices) != len(region.Sparse.Values) {
+			return fmt.Errorf("region %d has an invalid sparse vector", region.RegionIndex)
 		}
 		payload := copyPayload(basePayload)
-		payload["filename"], payload["text"], payload["chunk_index"] = doc.Filename, chunk.Text, chunk.ChunkIndex
-		if chunk.Page != nil {
-			payload["page"] = *chunk.Page
+		pointID := deterministicPointID(doc.IndexVersion, doc.DocumentID, region.RegionIndex)
+		payload["filename"], payload["text"], payload["region_id"], payload["chunk_index"] = doc.Filename, region.Text, pointID.GetUuid(), region.RegionIndex
+		if region.Page != nil {
+			payload["page"] = *region.Page
 		}
 		values, err := qdrant.TryValueMap(payload)
 		if err != nil {
-			return fmt.Errorf("encode sparse payload for chunk %d: %w", chunk.ChunkIndex, err)
+			return fmt.Errorf("encode sparse payload for region %d: %w", region.RegionIndex, err)
 		}
-		points = append(points, &qdrant.PointStruct{Id: deterministicPointID(doc.IndexVersion, doc.DocumentID, chunk.ChunkIndex), Vectors: qdrant.NewVectorsMap(map[string]*qdrant.Vector{"bm25": qdrant.NewVectorSparse(chunk.Sparse.Indices, chunk.Sparse.Values)}), Payload: values})
+		points = append(points, &qdrant.PointStruct{Id: pointID, Vectors: qdrant.NewVectorsMap(map[string]*qdrant.Vector{"bm25": qdrant.NewVectorSparse(region.Sparse.Indices, region.Sparse.Values)}), Payload: values})
 	}
 	if err := q.deleteFromCollection(ctx, q.sparseCollection, documentFilter(doc.NamespaceID, doc.CollectionID, doc.DocumentID)); err != nil {
 		return err
@@ -481,8 +506,8 @@ func documentFilter(namespaceID, collectionID, documentID string) *qdrant.Filter
 	return &qdrant.Filter{Must: []*qdrant.Condition{qdrant.NewMatchKeyword("namespace_id", namespaceID), qdrant.NewMatchKeyword("collection_id", collectionID), qdrant.NewMatchKeyword("document_id", documentID)}}
 }
 
-func deterministicPointID(indexVersion, documentID string, chunk int) *qdrant.PointId {
-	return qdrant.NewID(uuid.NewSHA1(uuid.NameSpaceOID, []byte(fmt.Sprintf("%s:%s:%d", indexVersion, documentID, chunk))).String())
+func deterministicPointID(indexVersion, documentID string, region int) *qdrant.PointId {
+	return qdrant.NewID(uuid.NewSHA1(uuid.NameSpaceOID, []byte(fmt.Sprintf("%s:%s:%d", indexVersion, documentID, region))).String())
 }
 
 func copyPayload(source map[string]any) map[string]any {

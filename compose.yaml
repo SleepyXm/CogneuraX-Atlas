@@ -27,7 +27,9 @@ services:
     restart: unless-stopped
 
   embeddings:
-    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-latest}
+    # Override TEI_IMAGE with cpu-1.9 on an x86_64 host. This pinned default
+    # matches the Apple Silicon development machine used by this repository.
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-arm64-latest@sha256:35c50d7494de22deecdb783b8f5b7e1d05765709bd90071b03469b9440d28656}
     command: ["--model-id", "${EMBED_MODEL:-BAAI/bge-small-en-v1.5}", "--port", "80"]
     ports:
       - "8081:80"
@@ -35,34 +37,16 @@ services:
       - tei_model_cache:/data
     restart: unless-stopped
 
-  summary:
-    image: ghcr.io/ggml-org/llama.cpp:server-b9265
-    command:
-      ["-hf", "${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}", "--alias", "${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "${SUMMARY_CONTEXT:-8192}", "--parallel", "1", "--cache-ram", "0", "--reasoning", "off"]
-    ports:
-      - "8082:8080"
-    volumes:
-      - llama_model_cache:/root/.cache
-    restart: unless-stopped
-
   processor:
     build: ./processor
     environment:
       EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-small-en-v1.5}
-      EMBED_MAX_TOKENS: "${EMBED_MAX_TOKENS:-512}"
-      SUMMARY_URL: http://summary:8080/v1
-      SUMMARY_MODEL: ${SUMMARY_MODEL:-Qwen/Qwen3-4B-GGUF:Q6_K}
-      SUMMARY_TOKENIZER: ${SUMMARY_TOKENIZER:-Qwen/Qwen3-4B}
-      SUMMARY_CONTEXT: "${SUMMARY_CONTEXT:-8192}"
-      SUMMARY_OUTPUT_TOKENS: "${SUMMARY_OUTPUT_TOKENS:-700}"
+      ATLAS_REGION_MAX_TOKENS: "${ATLAS_REGION_MAX_TOKENS:-128}"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/openapi.json')"]
       interval: 2s
       timeout: 3s
       retries: 30
-    depends_on:
-      summary:
-        condition: service_healthy
     volumes:
       - processor_model_cache:/root/.cache
     restart: unless-stopped
@@ -80,7 +64,7 @@ services:
       DATABASE_URL: postgres://atlas:atlas@postgres:5432/atlas?sslmode=disable
       ATLAS_ADDR: :8090
       ATLAS_SERVICE_TOKEN: ${ATLAS_SERVICE_TOKEN:-local-development-token}
-      ATLAS_INDEX_VERSION: ${ATLAS_INDEX_VERSION:-v1}
+      ATLAS_INDEX_VERSION: ${ATLAS_INDEX_VERSION:-v2}
       ATLAS_PROCESSOR_URL: http://processor:5001
       ATLAS_STORAGE: local
       ATLAS_DATA_DIR: /data/documents
@@ -90,8 +74,8 @@ services:
       ATLAS_SPARSE_THRESHOLD: ${ATLAS_SPARSE_THRESHOLD:-5.0}
       QDRANT_HOST: qdrant
       QDRANT_GRPC_PORT: 6334
-      QDRANT_ROUTE_COLLECTION: ${QDRANT_ROUTE_COLLECTION:-atlas_routes_v1}
-      QDRANT_CHUNK_COLLECTION: ${QDRANT_CHUNK_COLLECTION:-atlas_chunks_v1}
+      QDRANT_DENSE_COLLECTION: ${QDRANT_DENSE_COLLECTION:-atlas_dense_regions_v2}
+      QDRANT_SPARSE_COLLECTION: ${QDRANT_SPARSE_COLLECTION:-atlas_sparse_regions_v2}
       TEI_URL: http://embeddings:80
       TEI_EMBEDDING_DIMENSION: ${TEI_EMBEDDING_DIMENSION:-384}
       TEI_QUERY_PREFIX: "${TEI_QUERY_PREFIX:-Represent this sentence for searching relevant passages: }"
@@ -114,7 +98,6 @@ services:
 
 volumes:
   atlas_data:
-  llama_model_cache:
   postgres_data:
   processor_model_cache:
   qdrant_data:

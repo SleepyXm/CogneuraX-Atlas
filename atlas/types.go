@@ -34,7 +34,6 @@ type Document struct {
 	IndexStage    string    `json:"index_stage"`
 	SizeBytes     int64     `json:"size_bytes"`
 	FailureReason *string   `json:"failure_reason"`
-	RouteCount    int       `json:"route_count"`
 	ChunkCount    int       `json:"chunk_count"`
 	CreatedAt     time.Time `json:"created_at"`
 }
@@ -60,8 +59,8 @@ type objectStore interface {
 }
 
 type documentProcessor interface {
-	RouteDocument(context.Context, string, io.Reader) (processedDocument, error)
-	SparseDocument(context.Context, []processedChunk) ([]processedChunk, error)
+	ProcessDocument(context.Context, string, io.Reader) ([]processedRegion, error)
+	SparseDocument(context.Context, []processedRegion) ([]processedRegion, error)
 	SparseQuery(context.Context, string) (sparseVector, error)
 }
 
@@ -71,8 +70,8 @@ type denseEmbedder interface {
 
 type vectorIndex interface {
 	PrepareCollections(context.Context) error
-	ReplaceDenseRoutes(context.Context, indexDocument) error
-	ReplaceSparseChunks(context.Context, indexDocument) error
+	ReplaceDenseRegions(context.Context, indexDocument) error
+	ReplaceSparseRegions(context.Context, indexDocument) error
 	ActivateDocuments(context.Context, indexDocument, []string) error
 	DeleteDocument(context.Context, string, string, string) error
 	SearchDense(context.Context, retrievalScope, []float32, uint64) ([]string, error)
@@ -99,8 +98,9 @@ type clientError struct {
 }
 
 type ingestionArgs struct {
-	DocumentID string `json:"document_id"`
-	Stage      string `json:"stage"`
+	DocumentID   string `json:"document_id"`
+	Stage        string `json:"stage"`
+	IndexVersion string `json:"index_version"`
 }
 
 type sparseVector struct {
@@ -108,25 +108,17 @@ type sparseVector struct {
 	Values  []float32 `json:"values"`
 }
 
-type processedChunk struct {
-	Text       string       `json:"text"`
-	Page       *int         `json:"page"`
-	ChunkIndex int          `json:"chunk_index"`
-	Sparse     sparseVector `json:"sparse,omitempty"`
+type processedRegion struct {
+	Text        string       `json:"text"`
+	Page        *int         `json:"page"`
+	RegionIndex int          `json:"region_index"`
+	Sparse      sparseVector `json:"sparse,omitempty"`
 }
-
-type processedDocument struct {
-	Routes []processedRoute `json:"routes"`
-	Chunks []processedChunk `json:"chunks"`
-}
-
-type processedRoute struct{ Type, Text string }
 
 type indexDocument struct {
 	NamespaceID, CollectionID, DocumentID, Filename, IndexVersion string
-	Routes                                                        []processedRoute
 	Dense                                                         [][]float32
-	Chunks                                                        []processedChunk
+	Regions                                                       []processedRegion
 }
 
 type ingestionWorker struct {
