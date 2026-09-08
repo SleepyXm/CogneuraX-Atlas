@@ -33,6 +33,8 @@ class ProcessorTest(unittest.TestCase):
 
         class Tokenizer:
             def encode(self, text, add_special_tokens=True):
+                if text == "OVERVIEW: oversized":
+                    return list(range(513))
                 return list(range(2))
 
         class Summarizer:
@@ -40,7 +42,7 @@ class ProcessorTest(unittest.TestCase):
 
             def get_response(self, query_str, text_chunks):
                 self.calls.append(list(text_chunks))
-                return "TOPIC: compact\nTOPIC: compact\nPERSON: Alice"
+                return "TOPIC: compact\nTOPIC: compact\nOVERVIEW: oversized\nPERSON: Alice"
 
         summarizer = Summarizer()
         components = (Converter(), Chunker(), Tokenizer(), summarizer, 512)

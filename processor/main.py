@@ -127,7 +127,9 @@ def route_document(file: UploadFile):
         if separator and kind.strip().upper() in kinds and value.strip():
             text = line.strip()
             if len(tokenizer.encode(text, add_special_tokens=True)) > model_limit:
-                raise ValueError(f"routing facet exceeds {model_limit} embedding tokens")
+                # Keep the document usable when the model violates the facet
+                # limit; the remaining typed routes still describe it.
+                continue
             route = (kind.strip().lower(), text)
             if route not in seen_routes:
                 seen_routes.add(route)
