@@ -391,6 +391,16 @@ func (q *qdrantIndex) ensureCollection(ctx context.Context, name string, sparse 
 			return fmt.Errorf("index Qdrant payload %s.%s: %w", name, field.name, err)
 		}
 	}
+	if sparse {
+		lowercase, phrases := true, true
+		_, err := q.client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+			CollectionName: name, FieldName: "text", FieldType: qdrant.FieldType_FieldTypeText.Enum(), Wait: &wait,
+			FieldIndexParams: &qdrant.PayloadIndexParams{IndexParams: &qdrant.PayloadIndexParams_TextIndexParams{TextIndexParams: &qdrant.TextIndexParams{Tokenizer: qdrant.TokenizerType_Word, Lowercase: &lowercase, PhraseMatching: &phrases}}},
+		})
+		if err != nil && status.Code(err) != codes.AlreadyExists {
+			return fmt.Errorf("index Qdrant evidence text: %w", err)
+		}
+	}
 	return nil
 }
 

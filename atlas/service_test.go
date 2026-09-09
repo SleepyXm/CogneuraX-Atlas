@@ -22,8 +22,9 @@ import (
 
 type fakeIndex struct {
 	dense, regions            []string
+	anchors                   []string
 	scoped                    []Candidate
-	denseLimit, sparseLimit   uint64
+	denseLimit, denseCalls    uint64
 	denseWrites, sparseWrites int
 	denseRegions, activations int
 	denseError, sparseError   error
@@ -47,12 +48,13 @@ func (f *fakeIndex) ActivateDocuments(_ context.Context, _ indexDocument, ids []
 func (*fakeIndex) DeleteDocument(context.Context, string, string, string) error { return nil }
 func (f *fakeIndex) SearchDense(_ context.Context, _ retrievalScope, _ []float32, limit uint64) ([]string, error) {
 	f.denseLimit = limit
+	f.denseCalls++
 	return f.regions, nil
 }
-func (f *fakeIndex) SearchSparse(_ context.Context, _ retrievalScope, _ sparseVector, regions []string, limit uint64) ([]Candidate, error) {
+func (f *fakeIndex) SearchSparse(_ context.Context, _ retrievalScope, _ sparseVector, regions, anchors []string, _ uint64) ([]Candidate, error) {
 	f.sparseCalls++
-	f.sparseLimit = limit
 	f.dense = append([]string(nil), regions...)
+	f.anchors = append([]string(nil), anchors...)
 	return f.scoped, nil
 }
 
@@ -61,6 +63,7 @@ type fakeProcessor struct {
 	processErr error
 	sparseErr  error
 	queryCalls *int
+	queryText  *string
 }
 
 func (f fakeProcessor) ProcessDocument(context.Context, string, io.Reader) ([]processedRegion, error) {
@@ -72,19 +75,64 @@ func (f fakeProcessor) SparseDocument(_ context.Context, regions []processedRegi
 	}
 	return regions, f.sparseErr
 }
-func (f fakeProcessor) SparseQuery(context.Context, string) (sparseVector, error) {
+func (f fakeProcessor) SparseQuery(_ context.Context, query string) (sparseVector, error) {
 	if f.queryCalls != nil {
 		*f.queryCalls++
 	}
+	if f.queryText != nil {
+		*f.queryText = query
+	}
 	return sparseVector{Indices: []uint32{1}, Values: []float32{1}}, nil
+}
+
+func TestPromptPassSeparatesOriginalSpans(t *testing.T) {
+	cases := []struct {
+		question string
+		dense    string
+		sparse   string
+		anchors  []string
+	}{
+		{"Who challenged plague theory?", "Who challenged plague theory?", "challenged plague theory", nil},
+		{"According to the 2000 United States Census, how many people were living in Atlantic City?", "According to the 2000 United States Census, how many people were living in Atlantic City?", "2000 United States Census people living Atlantic City", []string{"2000", "United States Census", "Atlantic City"}},
+		{"Who has no power to pass laws?", "Who has no power to pass laws?", "no power pass laws", nil},
+		{"Who did John B Watson and David Graeber discover a fossil of?", "Who did John B Watson and David Graeber discover a fossil of?", "John B Watson David Graeber discover fossil", []string{"John B Watson", "David Graeber"}},
+		{"Where was France's Huguenot population centered?", "Where was France's Huguenot population centered?", "France Huguenot population centered", nil},
+		{"What happened in March of 1974?", "What happened in March of 1974?", "happened March 1974", []string{"1974"}},
+		{"What makes up the European Union's legislature?", "What makes up the European Union's legislature?", "makes up European Union legislature", []string{"European Union"}},
+	}
+	for _, test := range cases {
+		pass := partitionPrompt(test.question)
+		if pass.Dense != test.dense || pass.Sparse != test.sparse || !slices.Equal(pass.Anchors, test.anchors) {
+			t.Fatalf("unexpected prompt pass for %q: %+v", test.question, pass)
+		}
+	}
+}
+
+func TestRetrievalUsesSeparatedPromptPass(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	namespaceID, collectionID, documentID := "00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002", "00000000-0000-0000-0000-000000000003"
+	mock.ExpectQuery("SELECT b.index_version").WillReturnRows(sqlmock.NewRows([]string{"version", "regions"}).AddRow("v2", 8))
+	mock.ExpectQuery("SELECT d.id::text").WillReturnRows(sqlmock.NewRows([]string{"id", "filename"}).AddRow(documentID, "doc.md"))
+	index := &fakeIndex{regions: []string{"c"}, scoped: []Candidate{{Citation: Citation{CitationID: "c", DocumentID: documentID}, Text: "answer"}}}
+	sparseText, denseText := "", []string{}
+	service := &Service{db: db, processor: fakeProcessor{queryText: &sparseText}, embedder: fakeEmbedder{inputs: &denseText}, index: index, indexVersion: "v2", queryPrefix: "query: ", denseThreshold: .5, sparseThreshold: 12.5}
+	results, err := service.retrieveEvidenceRegions(context.Background(), namespaceID, collectionID, "According to the 2000 United States Census, how many people were living in Atlantic City?")
+	if err != nil || len(results) != 1 || index.denseCalls != 1 || !slices.Equal(denseText, []string{"query: According to the 2000 United States Census, how many people were living in Atlantic City?"}) || sparseText != "2000 United States Census people living Atlantic City" || !slices.Equal(index.anchors, []string{"2000", "United States Census", "Atlantic City"}) {
+		t.Fatalf("prompt was not separated: results=%v index=%+v dense=%v sparse=%q err=%v", results, index, denseText, sparseText, err)
+	}
 }
 
 type fakeEmbedder struct {
 	vector [][]float32
 	err    error
+	inputs *[]string
 }
 
 func (f fakeEmbedder) Embed(_ context.Context, texts []string) ([][]float32, error) {
+	if f.inputs != nil {
+		*f.inputs = append([]string(nil), texts...)
+	}
 	if f.vector == nil {
 		f.vector = make([][]float32, len(texts))
 		for index := range texts {
@@ -226,7 +274,7 @@ func TestRetrievalCasesStayInsideOneWorkflow(t *testing.T) {
 			index, queryCalls := &fakeIndex{regions: test.regions, scoped: test.scoped}, 0
 			service := &Service{db: db, processor: fakeProcessor{queryCalls: &queryCalls}, embedder: fakeEmbedder{}, index: index, indexVersion: "v2", queryPrefix: "query: ", denseThreshold: .55, sparseThreshold: 5}
 			results, err := service.retrieveEvidenceRegions(context.Background(), namespaceID, collectionID, "question")
-			if err != nil || len(results) != test.wantResults || index.denseLimit != 8 || index.sparseCalls != test.wantSparseCalls || queryCalls != test.wantSparseCalls || test.wantSparseCalls > 0 && (index.sparseLimit != uint64(len(test.regions)) || !slices.Equal(index.dense, test.regions)) {
+			if err != nil || len(results) != test.wantResults || index.denseLimit != 8 || index.sparseCalls != test.wantSparseCalls || queryCalls != test.wantSparseCalls || test.wantSparseCalls > 0 && !slices.Equal(index.dense, test.regions) {
 				t.Fatalf("retrieval flow changed: results=%v index=%+v err=%v", results, index, err)
 			}
 			if err := mock.ExpectationsWereMet(); err != nil {

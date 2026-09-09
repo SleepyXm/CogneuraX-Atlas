@@ -75,7 +75,7 @@ type vectorIndex interface {
 	ActivateDocuments(context.Context, indexDocument, []string) error
 	DeleteDocument(context.Context, string, string, string) error
 	SearchDense(context.Context, retrievalScope, []float32, uint64) ([]string, error)
-	SearchSparse(context.Context, retrievalScope, sparseVector, []string, uint64) ([]Candidate, error)
+	SearchSparse(context.Context, retrievalScope, sparseVector, []string, []string, uint64) ([]Candidate, error)
 }
 
 type Service struct {
@@ -146,6 +146,11 @@ type qdrantIndex struct {
 type retrievalScope struct {
 	NamespaceID, CollectionID, IndexVersion string
 	DenseThreshold, SparseThreshold         float32
+}
+
+type promptPass struct {
+	Dense, Sparse string
+	Anchors       []string
 }
 
 type storedObject struct {

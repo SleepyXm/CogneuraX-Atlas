@@ -1,0 +1,1508 @@
+{
+  "name": "Atlas V0.1 multi-section SQuAD 2.0 retrieval corpus",
+  "source": "https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v2.0.json",
+  "source_sha256": "80a5225e94905956a6446d296ca1093975c4d3b3260f1d6c8f68bc2ab77182d8",
+  "license": "CC BY-SA 4.0",
+  "seed": 104729,
+  "selection": "10 random article titles; 10 random included paragraphs per document; one answerable question per included paragraph; two questions from withheld same-article paragraphs per document whose answer spans are absent from indexed content",
+  "documents": [
+    {
+      "filename": "01-computational-complexity-theory.md",
+      "title": "Computational_complexity_theory",
+      "article_index": 1,
+      "source_paragraphs": [
+        27,
+        5,
+        29,
+        30,
+        1,
+        3,
+        43,
+        40,
+        15,
+        14
+      ],
+      "content": "# Computational complexity theory\n\n## Section 1\n\nFor the complexity classes defined in this way, it is desirable to prove that relaxing the requirements on (say) computation time indeed defines a bigger set of problems. In particular, although DTIME(n) is contained in DTIME(n2), it would be interesting to know if the inclusion is strict. For time and space requirements, the answer to such questions is given by the time and space hierarchy theorems respectively. They are called hierarchy theorems because they induce a proper hierarchy on the classes defined by constraining the respective resources. Thus there are pairs of complexity classes such that one is properly included in the other. Having deduced such proper set inclusions, we can proceed to make quantitative statements about how much more additional time or space is needed in order to increase the number of problems that can be solved.\n\n## Section 2\n\nWhen considering computational problems, a problem instance is a string over an alphabet. Usually, the alphabet is taken to be the binary alphabet (i.e., the set {0,1}), and thus the strings are bitstrings. As in a real-world computer, mathematical objects other than bitstrings must be suitably encoded. For example, integers can be represented in binary notation, and graphs can be encoded directly via their adjacency matrices, or by encoding their adjacency lists in binary.\n\n## Section 3\n\nMany complexity classes are defined using the concept of a reduction. A reduction is a transformation of one problem into another problem. It captures the informal notion of a problem being at least as difficult as another problem. For instance, if a problem X can be solved using an algorithm for Y, X is no more difficult than Y, and we say that X reduces to Y. There are many different types of reductions, based on the method of reduction, such as Cook reductions, Karp reductions and Levin reductions, and the bound on the complexity of reductions, such as polynomial-time reductions or log-space reductions.\n\n## Section 4\n\nThe most commonly used reduction is a polynomial-time reduction. This means that the reduction process takes polynomial time. For example, the problem of squaring an integer can be reduced to the problem of multiplying two integers. This means an algorithm for multiplying two integers can be used to square an integer. Indeed, this can be done by giving the same input to both inputs of the multiplication algorithm. Thus we see that squaring is not more difficult than multiplication, since squaring can be reduced to multiplication.\n\n## Section 5\n\nA problem is regarded as inherently difficult if its solution requires significant resources, whatever the algorithm used. The theory formalizes this intuition, by introducing mathematical models of computation to study these problems and quantifying the amount of resources needed to solve them, such as time and storage. Other complexity measures are also used, such as the amount of communication (used in communication complexity), the number of gates in a circuit (used in circuit complexity) and the number of processors (used in parallel computing). One of the roles of computational complexity theory is to determine the practical limits on what computers can and cannot do.\n\n## Section 6\n\nA computational problem can be viewed as an infinite collection of instances together with a solution for every instance. The input string for a computational problem is referred to as a problem instance, and should not be confused with the problem itself. In computational complexity theory, a problem refers to the abstract question to be solved. In contrast, an instance of this problem is a rather concrete utterance, which can serve as the input for a decision problem. For example, consider the problem of primality testing. The instance is a number (e.g. 15) and the solution is \"yes\" if the number is prime and \"no\" otherwise (in this case \"no\"). Stated another way, the instance is a particular input to the problem, and the solution is the output corresponding to the given input.\n\n## Section 7\n\nBefore the actual research explicitly devoted to the complexity of algorithmic problems started off, numerous foundations were laid out by various researchers. Most influential among these was the definition of Turing machines by Alan Turing in 1936, which turned out to be a very robust and flexible simplification of a computer.\n\n## Section 8\n\nSimilarly, it is not known if L (the set of all problems that can be solved in logarithmic space) is strictly contained in P or equal to P. Again, there are many complexity classes between the two, such as NL and NC, and it is not known if they are distinct or equal classes.\n\n## Section 9\n\nMany machine models different from the standard multi-tape Turing machines have been proposed in the literature, for example random access machines. Perhaps surprisingly, each of these models can be converted to another without providing any extra computational power. The time and memory consumption of these alternate models may vary. What all these models have in common is that the machines operate deterministically.\n\n## Section 10\n\nMany types of Turing machines are used to define complexity classes, such as deterministic Turing machines, probabilistic Turing machines, non-deterministic Turing machines, quantum Turing machines, symmetric Turing machines and alternating Turing machines. They are all equally powerful in principle, but when resources (such as time or space) are bounded, some of these may be more powerful than others.\n"
+    },
+    {
+      "filename": "02-immune-system.md",
+      "title": "Immune_system",
+      "article_index": 25,
+      "source_paragraphs": [
+        1,
+        33,
+        39,
+        15,
+        16,
+        14,
+        42,
+        44,
+        8,
+        43
+      ],
+      "content": "# Immune system\n\n## Section 1\n\nDisorders of the immune system can result in autoimmune diseases, inflammatory diseases and cancer. Immunodeficiency occurs when the immune system is less active than normal, resulting in recurring and life-threatening infections. In humans, immunodeficiency can either be the result of a genetic disease such as severe combined immunodeficiency, acquired conditions such as HIV/AIDS, or the use of immunosuppressive medication. In contrast, autoimmunity results from a hyperactive immune system attacking normal tissues as if they were foreign organisms. Common autoimmune diseases include Hashimoto's thyroiditis, rheumatoid arthritis, diabetes mellitus type 1, and systemic lupus erythematosus. Immunology covers the study of all aspects of the immune system.\n\n## Section 2\n\nAnti-inflammatory drugs are often used to control the effects of inflammation. Glucocorticoids are the most powerful of these drugs; however, these drugs can have many undesirable side effects, such as central obesity, hyperglycemia, osteoporosis, and their use must be tightly controlled. Lower doses of anti-inflammatory drugs are often used in conjunction with cytotoxic or immunosuppressive drugs such as methotrexate or azathioprine. Cytotoxic drugs inhibit the immune response by killing dividing cells such as activated T cells. However, the killing is indiscriminate and other constantly dividing cells and their organs are affected, which causes toxic side effects. Immunosuppressive drugs such as cyclosporin prevent T cells from responding to signals correctly by inhibiting signal transduction pathways.\n\n## Section 3\n\nImmunology is strongly experimental in everyday practice but is also characterized by an ongoing theoretical attitude. Many theories have been suggested in immunology from the end of the nineteenth century up to the present time. The end of the 19th century and the beginning of the 20th century saw a battle between \"cellular\" and \"humoral\" theories of immunity. According to the cellular theory of immunity, represented in particular by Elie Metchnikoff, it was cells – more precisely, phagocytes – that were responsible for immune responses. In contrast, the humoral theory of immunity, held, among others, by Robert Koch and Emil von Behring, stated that the active immune agents were soluble components (molecules) found in the organism’s “humors” rather than its cells.\n\n## Section 4\n\nThe adaptive immune system evolved in early vertebrates and allows for a stronger immune response as well as immunological memory, where each pathogen is \"remembered\" by a signature antigen. The adaptive immune response is antigen-specific and requires the recognition of specific \"non-self\" antigens during a process called antigen presentation. Antigen specificity allows for the generation of responses that are tailored to specific pathogens or pathogen-infected cells. The ability to mount these tailored responses is maintained in the body by \"memory cells\". Should a pathogen infect the body more than once, these specific memory cells are used to quickly eliminate it.\n\n## Section 5\n\nBoth B cells and T cells carry receptor molecules that recognize specific targets. T cells recognize a \"non-self\" target, such as a pathogen, only after antigens (small fragments of the pathogen) have been processed and presented in combination with a \"self\" receptor called a major histocompatibility complex (MHC) molecule. There are two major subtypes of T cells: the killer T cell and the helper T cell. In addition there are regulatory T cells which have a role in modulating immune response. Killer T cells only recognize antigens coupled to Class I MHC molecules, while helper T cells and regulatory T cells only recognize antigens coupled to Class II MHC molecules. These two mechanisms of antigen presentation reflect the different roles of the two types of T cell. A third, minor subtype are the γδ T cells that recognize intact antigens that are not bound to MHC receptors.\n\n## Section 6\n\nNatural killer cells, or NK cells, are a component of the innate immune system which does not directly attack invading microbes. Rather, NK cells destroy compromised host cells, such as tumor cells or virus-infected cells, recognizing such cells by a condition known as \"missing self.\" This term describes cells with low levels of a cell-surface marker called MHC I (major histocompatibility complex) – a situation that can arise in viral infections of host cells. They were named \"natural killer\" because of the initial notion that they do not require activation in order to kill cells that are \"missing self.\" For many years it was unclear how NK cells recognize tumor cells and infected cells. It is now known that the MHC makeup on the surface of those cells is altered and the NK cells become activated through recognition of \"missing self\". Normal body cells are not recognized and attacked by NK cells because they express intact self MHC antigens. Those MHC antigens are recognized by killer cell immunoglobulin receptors (KIR) which essentially put the brakes on NK cells.\n\n## Section 7\n\nAn evasion strategy used by several pathogens to avoid the innate immune system is to hide within the cells of their host (also called intracellular pathogenesis). Here, a pathogen spends most of its life-cycle inside host cells, where it is shielded from direct contact with immune cells, antibodies and complement. Some examples of intracellular pathogens include viruses, the food poisoning bacterium Salmonella and the eukaryotic parasites that cause malaria (Plasmodium falciparum) and leishmaniasis (Leishmania spp.). Other bacteria, such as Mycobacterium tuberculosis, live inside a protective capsule that prevents lysis by complement. Many pathogens secrete compounds that diminish or misdirect the host's immune response. Some bacteria form biofilms to protect themselves from the cells and proteins of the immune system. Such biofilms are present in many successful infections, e.g., the chronic Pseudomonas aeruginosa and Burkholderia cenocepacia infections characteristic of cystic fibrosis. Other bacteria generate surface proteins that bind to antibodies, rendering them ineffective; examples include Streptococcus (protein G), Staphylococcus aureus (protein A), and Peptostreptococcus magnus (protein L).\n\n## Section 8\n\nAnother important role of the immune system is to identify and eliminate tumors. This is called immune surveillance. The transformed cells of tumors express antigens that are not found on normal cells. To the immune system, these antigens appear foreign, and their presence causes immune cells to attack the transformed tumor cells. The antigens expressed by tumors have several sources; some are derived from oncogenic viruses like human papillomavirus, which causes cervical cancer, while others are the organism's own proteins that occur at low levels in normal cells but reach high levels in tumor cells. One example is an enzyme called tyrosinase that, when expressed at high levels, transforms certain skin cells (e.g. melanocytes) into tumors called melanomas. A third possible source of tumor antigens are proteins normally important for regulating cell growth and survival, that commonly mutate into cancer inducing molecules called oncogenes.\n\n## Section 9\n\nWithin the genitourinary and gastrointestinal tracts, commensal flora serve as biological barriers by competing with pathogenic bacteria for food and space and, in some cases, by changing the conditions in their environment, such as pH or available iron. This reduces the probability that pathogens will reach sufficient numbers to cause illness. However, since most antibiotics non-specifically target bacteria and do not affect fungi, oral antibiotics can lead to an \"overgrowth\" of fungi and cause conditions such as a vaginal candidiasis (a yeast infection). There is good evidence that re-introduction of probiotic flora, such as pure cultures of the lactobacilli normally found in unpasteurized yogurt, helps restore a healthy balance of microbial populations in intestinal infections in children and encouraging preliminary data in studies on bacterial gastroenteritis, inflammatory bowel diseases, urinary tract infection and post-surgical infections.\n\n## Section 10\n\nThe mechanisms used to evade the adaptive immune system are more complicated. The simplest approach is to rapidly change non-essential epitopes (amino acids and/or sugars) on the surface of the pathogen, while keeping essential epitopes concealed. This is called antigenic variation. An example is HIV, which mutates rapidly, so the proteins on its viral envelope that are essential for entry into its host target cell are constantly changing. These frequent changes in antigens may explain the failures of vaccines directed at this virus. The parasite Trypanosoma brucei uses a similar strategy, constantly switching one type of surface protein for another, allowing it to stay one step ahead of the antibody response. Masking antigens with host molecules is another common strategy for avoiding detection by the immune system. In HIV, the envelope that covers the virion is formed from the outermost membrane of the host cell; such \"self-cloaked\" viruses make it difficult for the immune system to identify them as \"non-self\" structures.\n"
+    },
+    {
+      "filename": "03-jacksonville-florida.md",
+      "title": "Jacksonville,_Florida",
+      "article_index": 21,
+      "source_paragraphs": [
+        12,
+        15,
+        14,
+        4,
+        6,
+        9,
+        13,
+        17,
+        19,
+        11
+      ],
+      "content": "# Jacksonville, Florida\n\n## Section 1\n\nIn the mid-1960s, corruption scandals began to arise among many of the city's officials, who were mainly elected through the traditional old boy network. After a grand jury was convened to investigate, 11 officials were indicted and more were forced to resign. Jacksonville Consolidation, led by J. J. Daniel and Claude Yates, began to win more support during this period, from both inner city blacks, who wanted more involvement in government, and whites in the suburbs, who wanted more services and more control over the central city. In 1964 all 15 of Duval County's public high schools lost their accreditation. This added momentum to proposals for government reform. Lower taxes, increased economic development, unification of the community, better public spending and effective administration by a more central authority were all cited as reasons for a new consolidated government.\n\n## Section 2\n\nThe tallest building in Downtown Jacksonville's skyline is the Bank of America Tower, constructed in 1990 as the Barnett Center. It has a height of 617 ft (188 m) and includes 42 floors. Other notable structures include the 37-story Wells Fargo Center (with its distinctive flared base making it the defining building in the Jacksonville skyline), originally built in 1972-74 by the Independent Life and Accident Insurance Company, and the 28 floor Riverplace Tower which, when completed in 1967, was the tallest precast, post-tensioned concrete structure in the world.\n\n## Section 3\n\nAccording to the United States Census Bureau, the city has a total area of 874.3 square miles (2,264 km2), making Jacksonville the largest city in land area in the contiguous United States; of this, 86.66% (757.7 sq mi or 1,962 km2) is land and ; 13.34% (116.7 sq mi or 302 km2) is water. Jacksonville surrounds the town of Baldwin. Nassau County lies to the north, Baker County lies to the west, and Clay and St. Johns County lie to the south; the Atlantic Ocean lies to the east, along with the Jacksonville Beaches. The St. Johns River divides the city. The Trout River, a major tributary of the St. Johns River, is located entirely within Jacksonville.\n\n## Section 4\n\nFrench Huguenot explorer Jean Ribault charted the St. Johns River in 1562 calling it the River of May because he discovered it in May. Ribault erected a stone column near present-day Jacksonville claiming the newly discovered land for France. In 1564, René Goulaine de Laudonnière established the first European settlement, Fort Caroline, on the St. Johns near the main village of the Saturiwa. Philip II of Spain ordered Pedro Menéndez de Avilés to protect the interest of Spain by attacking the French presence at Fort Caroline. On September 20, 1565, a Spanish force from the nearby Spanish settlement of St. Augustine attacked Fort Caroline, and killed nearly all the French soldiers defending it. The Spanish renamed the fort San Mateo, and following the ejection of the French, St. Augustine's position as the most important settlement in Florida was solidified. The location of Fort Caroline is subject to debate but a reconstruction of the fort was established on the St. Johns River in 1964.\n\n## Section 5\n\nDuring the American Civil War, Jacksonville was a key supply point for hogs and cattle being shipped from Florida to aid the Confederate cause. The city was blockaded by Union forces, who gained control of the nearby Fort Clinch. Though no battles were fought in Jacksonville proper, the city changed hands several times between Union and Confederate forces. The Skirmish of the Brick Church in 1862 just outside Jacksonville proper resulted in the first Confederate victory in Florida. In February 1864 Union forces left Jacksonville and confronted a Confederate Army at the Battle of Olustee resulting in a Confederate victory. Union forces then retreated to Jacksonville and held the city for the remainder of the war. In March 1864 a Confederate cavalry confronted a Union expedition resulting in the Battle of Cedar Creek. Warfare and the long occupation left the city disrupted after the war.\n\n## Section 6\n\nIn the 1910s, New York–based filmmakers were attracted to Jacksonville's warm climate, exotic locations, excellent rail access, and cheap labor. Over the course of the decade, more than 30 silent film studios were established, earning Jacksonville the title of \"Winter Film Capital of the World\". However, the emergence of Hollywood as a major film production center ended the city's film industry. One converted movie studio site, Norman Studios, remains in Arlington; It has been converted to the Jacksonville Silent Film Museum at Norman Studios.\n\n## Section 7\n\nWhen a consolidation referendum was held in 1967, voters approved the plan. On October 1, 1968, the governments merged to create the Consolidated City of Jacksonville. Fire, police, health & welfare, recreation, public works, and housing & urban development were all combined under the new government. In honor of the occasion, then-Mayor Hans Tanzler posed with actress Lee Meredith behind a sign marking the new border of the \"Bold New City of the South\" at Florida 13 and Julington Creek. The Better Jacksonville Plan, promoted as a blueprint for Jacksonville's future and approved by Jacksonville voters in 2000, authorized a half-penny sales tax. This would generate most of the revenue required for the $2.25 billion package of major projects that included road & infrastructure improvements, environmental preservation, targeted economic development and new or improved public facilities.\n\n## Section 8\n\nMean monthly temperatures range from around 53 F in January to 82 F in July. High temperatures average 64 to 92 °F (18 to 33 °C) throughout the year. High heat indices are common for the summer months in the area, with indices above 110 °F (43.3 °C) possible. The highest temperature recorded was 104 °F (40 °C) on July 11, 1879 and July 28, 1872. It is common for thunderstorms to erupt during a typical summer afternoon. These are caused by the rapid heating of the land relative to the water, combined with extremely high humidity.\n\n## Section 9\n\nJacksonville is the most populous city in Florida, and the twelfth most populous city in the United States. As of 2010[update], there were 821,784 people and 366,273 households in the city. Jacksonville has the country's tenth-largest Arab population, with a total population of 5,751 according to the 2000 United States Census. Jacksonville has Florida's largest Filipino American community, with 25,033 in the metropolitan area as of the 2010 Census. Much of Jacksonville's Filipino community served in or has ties to the United States Navy.\n\n## Section 10\n\nMuch of the city's tax base dissipated, leading to problems with funding education, sanitation, and traffic control within the city limits. In addition, residents in unincorporated suburbs had difficulty obtaining municipal services, such as sewage and building code enforcement. In 1958, a study recommended that the city of Jacksonville begin annexing outlying communities in order to create the needed tax base to improve services throughout the county. Voters outside the city limits rejected annexation plans in six referendums between 1960 and 1965.\n"
+    },
+    {
+      "filename": "04-university-of-chicago.md",
+      "title": "University_of_Chicago",
+      "article_index": 23,
+      "source_paragraphs": [
+        17,
+        21,
+        2,
+        19,
+        9,
+        13,
+        14,
+        3,
+        0,
+        32
+      ],
+      "content": "# University of Chicago\n\n## Section 1\n\nThe University of Chicago Library system encompasses six libraries that contain a total of 9.8 million volumes, the 11th most among library systems in the United States. The university's main library is the Regenstein Library, which contains one of the largest collections of print volumes in the United States. The Joe and Rika Mansueto Library, built in 2011, houses a large study space and an automatic book storage and retrieval system. The John Crerar Library contains more than 1.3 million volumes in the biological, medical and physical sciences and collections in general science and the philosophy and history of science, medicine, and technology. The university also operates a number of special libraries, including the D'Angelo Law Library, the Social Service Administration Library, and the Eckhart Library for mathematics and computer science, which closed temporarily for renovation on July 8, 2013. Harper Memorial Library no longer contains any volumes; however it is, in addition to the Regenstein Library, a 24-hour study space on campus.\n\n## Section 2\n\nIn the fall quarter of 2014, the University of Chicago enrolled 5,792 students in the College, 3,468 students in its four graduate divisions, 5,984 students in its professional schools, and 15,244 students overall. In the 2012 Spring Quarter, international students comprised almost 19% of the overall study body, over 26% of students were domestic ethnic minorities, and about 44% of enrolled students were female. Admissions to the University of Chicago is highly selective. The middle 50% band of SAT scores for the undergraduate class of 2015, excluding the writing section, was 1420–1530, the average MCAT score for entering students in the Pritzker School of Medicine in 2011 was 36, and the median LSAT score for entering students in the Law School in 2011 was 171. In 2015, the College of the University of Chicago had an acceptance rate of 7.8% for the Class of 2019, the lowest in the college's history.\n\n## Section 3\n\nFounded by the American Baptist Education Society with a donation from oil magnate and wealthiest man in history John D. Rockefeller, the University of Chicago was incorporated in 1890; William Rainey Harper became the university's first president in 1891, and the first classes were held in 1892. Both Harper and future president Robert Maynard Hutchins advocated for Chicago's curriculum to be based upon theoretical and perennial issues rather than on applied sciences and commercial utility. With Harper's vision in mind, the University of Chicago also became one of the 14 founding members of the Association of American Universities, an international organization of leading research universities, in 1900.\n\n## Section 4\n\nThe University of Chicago has been the site of some important experiments and academic movements. In economics, the university has played an important role in shaping ideas about the free market and is the namesake of the Chicago school of economics, the school of economic thought supported by Milton Friedman and other economists. The university's sociology department was the first independent sociology department in the United States and gave birth to the Chicago school of sociology. In physics, the university was the site of the Chicago Pile-1 (the first self-sustained man-made nuclear reaction, part of the Manhattan Project), of Robert Millikan's oil-drop experiment that calculated the charge of the electron, and of the development of radiocarbon dating by Willard F. Libby in 1947. The chemical experiment that tested how life originated on early Earth, the Miller–Urey experiment, was conducted at the university. REM sleep was discovered at the university in 1953 by Nathaniel Kleitman and Eugene Aserinsky.\n\n## Section 5\n\nThe first buildings of the University of Chicago campus, which make up what is now known as the Main Quadrangles, were part of a \"master plan\" conceived by two University of Chicago trustees and plotted by Chicago architect Henry Ives Cobb. The Main Quadrangles consist of six quadrangles, each surrounded by buildings, bordering one larger quadrangle. The buildings of the Main Quadrangles were designed by Cobb, Shepley, Rutan and Coolidge, Holabird & Roche, and other architectural firms in a mixture of the Victorian Gothic and Collegiate Gothic styles, patterned on the colleges of the University of Oxford. (Mitchell Tower, for example, is modeled after Oxford's Magdalen Tower, and the university Commons, Hutchinson Hall, replicates Christ Church Hall.)\n\n## Section 6\n\nThe academic bodies of the University of Chicago consist of the College, four divisions of graduate research and seven professional schools. The university also contains a library system, the University of Chicago Press, the University of Chicago Laboratory Schools, and the University of Chicago Medical Center, and holds ties with a number of independent academic institutions, including Fermilab, Argonne National Laboratory, and the Marine Biological Laboratory. The university is accredited by The Higher Learning Commission.\n\n## Section 7\n\nThe College of the University of Chicago grants Bachelor of Arts and Bachelor of Science degrees in 50 academic majors and 28 minors. The college's academics are divided into five divisions: the Biological Sciences Collegiate Division, the Physical Sciences Collegiate Division, the Social Sciences Collegiate Division, the Humanities Collegiate Division, and the New Collegiate Division. The first four are sections within their corresponding graduate divisions, while the New Collegiate Division administers interdisciplinary majors and studies which do not fit in one of the other four divisions.\n\n## Section 8\n\nThe University of Chicago was created and incorporated as a coeducational, secular institution in 1890 by the American Baptist Education Society and a donation from oil magnate and philanthropist John D. Rockefeller on land donated by Marshall Field. While the Rockefeller donation provided money for academic operations and long-term endowment, it was stipulated that such money could not be used for buildings. The original physical campus was financed by donations from wealthy Chicagoans like Silas B. Cobb who provided the funds for the campus' first building, Cobb Lecture Hall, and matched Marshall Field's pledge of $100,000. Other early benefactors included businessmen Charles L. Hutchinson (trustee, treasurer and donor of Hutchinson Commons), Martin A. Ryerson (president of the board of trustees and donor of the Ryerson Physical Laboratory) Adolphus Clay Bartlett and Leon Mandel, who funded the construction of the gymnasium and assembly hall, and George C. Walker of the Walker Museum, a relative of Cobb who encouraged his inaugural donation for facilities.\n\n## Section 9\n\nThe University of Chicago (UChicago, Chicago, or U of C) is a private research university in Chicago. The university, established in 1890, consists of The College, various graduate programs, interdisciplinary committees organized into four academic research divisions and seven professional schools. Beyond the arts and sciences, Chicago is also well known for its professional schools, which include the Pritzker School of Medicine, the University of Chicago Booth School of Business, the Law School, the School of Social Service Administration, the Harris School of Public Policy Studies, the Graham School of Continuing Liberal and Professional Studies and the Divinity School. The university currently enrolls approximately 5,000 students in the College and around 15,000 students overall.\n\n## Section 10\n\nIn economics, notable Nobel Memorial Prize in Economic Sciences winners Milton Friedman, a major advisor to Republican U.S. President Ronald Reagan and Conservative British Prime Minister Margaret Thatcher, George Stigler, Nobel laureate and proponent of regulatory capture theory, Gary Becker, an important contributor to the family economics branch of economics, Herbert A. Simon, responsible for the modern interpretation of the concept of organizational decision-making, Paul Samuelson, the first American to win the Nobel Memorial Prize in Economic Sciences, and Eugene Fama, known for his work on portfolio theory, asset pricing and stock market behaviour, are all graduates. American economist, social theorist, political philosopher, and author Thomas Sowell is also an alumnus.\n"
+    },
+    {
+      "filename": "05-southern-california.md",
+      "title": "Southern_California",
+      "article_index": 2,
+      "source_paragraphs": [
+        36,
+        35,
+        15,
+        9,
+        10,
+        20,
+        0,
+        24,
+        4,
+        14
+      ],
+      "content": "# Southern California\n\n## Section 1\n\nFrom 2005 to 2014, there were two Major League Soccer teams in Los Angeles — the LA Galaxy and Chivas USA — that both played at the StubHub Center and were local rivals. However, Chivas were suspended following the 2014 MLS season, with a second MLS team scheduled to return in 2018.\n\n## Section 2\n\nProfessional sports teams in Southern California include teams from the NFL (Los Angeles Rams, San Diego Chargers); NBA (Los Angeles Lakers, Los Angeles Clippers); MLB (Los Angeles Dodgers, Los Angeles Angels of Anaheim, San Diego Padres); NHL (Los Angeles Kings, Anaheim Ducks); and MLS (LA Galaxy).\n\n## Section 3\n\nTraveling south on Interstate 5, the main gap to continued urbanization is Camp Pendleton. The cities and communities along Interstate 15 and Interstate 215 are so inter-related that Temecula and Murrieta have as much connection with the San Diego metropolitan area as they do with the Inland Empire. To the east, the United States Census Bureau considers the San Bernardino and Riverside County areas, Riverside-San Bernardino area as a separate metropolitan area from Los Angeles County. While many commute to L.A. and Orange Counties, there are some differences in development, as most of San Bernardino and Riverside Counties (the non-desert portions) were developed in the 1980s and 1990s. Newly developed exurbs formed in the Antelope Valley north of Los Angeles, the Victor Valley and the Coachella Valley with the Imperial Valley. Also, population growth was high in the Bakersfield-Kern County, Santa Maria and San Luis Obispo areas.\n\n## Section 4\n\n\"Southern California\" is not a formal geographic designation, and definitions of what constitutes southern California vary. Geographically, California's north-south midway point lies at exactly 37° 9' 58.23\" latitude, around 11 miles (18 km) south of San Jose; however, this does not coincide with popular use of the term. When the state is divided into two areas (northern and southern California), the term \"southern California\" usually refers to the ten southern-most counties of the state. This definition coincides neatly with the county lines at 35° 47′ 28″ north latitude, which form the northern borders of San Luis Obispo, Kern, and San Bernardino counties. Another definition for southern California uses Point Conception and the Tehachapi Mountains as the northern boundary.\n\n## Section 5\n\nThough there is no official definition for the northern boundary of southern California, such a division has existed from the time when Mexico ruled California, and political disputes raged between the Californios of Monterey in the upper part and Los Angeles in the lower part of Alta California. Following the acquisition of California by the United States, the division continued as part of the attempt by several pro-slavery politicians to arrange the division of Alta California at 36 degrees, 30 minutes, the line of the Missouri Compromise. Instead, the passing of the Compromise of 1850 enabled California to be admitted to the Union as a free state, preventing southern California from becoming its own separate slave state.\n\n## Section 6\n\nSouthern California is divided culturally, politically, and economically into distinctive regions, each containing its own culture and atmosphere, anchored usually by a city with both national and sometimes global recognition, which are often the hub of economic activity for its respective region and being home to many tourist destinations. Each region is further divided into many culturally distinct areas but as a whole combine to create the southern California atmosphere.\n\n## Section 7\n\nSouthern California, often abbreviated SoCal, is a geographic and cultural region that generally comprises California's southernmost 10 counties. The region is traditionally described as \"eight counties\", based on demographics and economic ties: Imperial, Los Angeles, Orange, Riverside, San Bernardino, San Diego, Santa Barbara, and Ventura. The more extensive 10-county definition, including Kern and San Luis Obispo counties, is also used based on historical political divisions. Southern California is a major economic center for the state of California and the United States.\n\n## Section 8\n\nSouthern California's economy is diverse and one of the largest in the United States. It is dominated and heavily dependent upon abundance of petroleum, as opposed to other regions where automobiles not nearly as dominant, the vast majority of transport runs on this fuel. Southern California is famous for tourism and Hollywood (film, television, and music). Other industries include software, automotive, ports, finance, tourism, biomedical, and regional logistics. The region was a leader in the housing bubble 2001–2007, and has been heavily impacted by the housing crash.\n\n## Section 9\n\nWithin southern California are two major cities, Los Angeles and San Diego, as well as three of the country's largest metropolitan areas. With a population of 3,792,621, Los Angeles is the most populous city in California and the second most populous in the United States. To the south and with a population of 1,307,402 is San Diego, the second most populous city in the state and the eighth most populous in the nation.\n\n## Section 10\n\nSouthern California consists of a heavily developed urban environment, home to some of the largest urban areas in the state, along with vast areas that have been left undeveloped. It is the third most populated megalopolis in the United States, after the Great Lakes Megalopolis and the Northeastern megalopolis. Much of southern California is famous for its large, spread-out, suburban communities and use of automobiles and highways. The dominant areas are Los Angeles, Orange County, San Diego, and Riverside-San Bernardino, each of which is the center of its respective metropolitan area, composed of numerous smaller cities and communities. The urban area is also host to an international metropolitan region in the form of San Diego–Tijuana, created by the urban area spilling over into Baja California.\n"
+    },
+    {
+      "filename": "06-black-death.md",
+      "title": "Black_Death",
+      "article_index": 14,
+      "source_paragraphs": [
+        10,
+        21,
+        3,
+        17,
+        1,
+        14,
+        9,
+        4,
+        7,
+        6
+      ],
+      "content": "# Black Death\n\n## Section 1\n\nIn October 2010, the open-access scientific journal PLoS Pathogens published a paper by a multinational team who undertook a new investigation into the role of Yersinia pestis in the Black Death following the disputed identification by Drancourt and Raoult in 1998. They assessed the presence of DNA/RNA with Polymerase Chain Reaction (PCR) techniques for Y. pestis from the tooth sockets in human skeletons from mass graves in northern, central and southern Europe that were associated archaeologically with the Black Death and subsequent resurgences. The authors concluded that this new research, together with prior analyses from the south of France and Germany, \". . . ends the debate about the etiology of the Black Death, and unambiguously demonstrates that Y. pestis was the causative agent of the epidemic plague that devastated Europe during the Middle Ages\".\n\n## Section 2\n\nIn the first half of the 17th century, a plague claimed some 1.7 million victims in Italy, or about 14% of the population. In 1656, the plague killed about half of Naples' 300,000 inhabitants. More than 1.25 million deaths resulted from the extreme incidence of plague in 17th-century Spain. The plague of 1649 probably reduced the population of Seville by half. In 1709–13, a plague epidemic that followed the Great Northern War (1700–21, Sweden v. Russia and allies) killed about 100,000 in Sweden, and 300,000 in Prussia. The plague killed two-thirds of the inhabitants of Helsinki, and claimed a third of Stockholm's population. Europe's last major epidemic occurred in 1720 in Marseille.\n\n## Section 3\n\nFrom Italy, the disease spread northwest across Europe, striking France, Spain, Portugal and England by June 1348, then turned and spread east through Germany and Scandinavia from 1348 to 1350. It was introduced in Norway in 1349 when a ship landed at Askøy, then spread to Bjørgvin (modern Bergen) and Iceland. Finally it spread to northwestern Russia in 1351. The plague was somewhat less common in parts of Europe that had smaller trade relations with their neighbours, including the Kingdom of Poland, the majority of the Basque Country, isolated parts of Belgium and the Netherlands, and isolated alpine villages throughout the continent.\n\n## Section 4\n\nThe most widely accepted estimate for the Middle East, including Iraq, Iran and Syria, during this time, is for a death rate of about a third. The Black Death killed about 40% of Egypt's population. Half of Paris's population of 100,000 people died. In Italy, the population of Florence was reduced from 110–120 thousand inhabitants in 1338 down to 50 thousand in 1351. At least 60% of the population of Hamburg and Bremen perished, and a similar percentage of Londoners may have died from the disease as well. Interestingly while contemporary reports account of mass burial pits being created in response to the large numbers of dead, recent scientific investigations of a burial pit in Central London found well-preserved individuals to be buried in isolated, evenly spaced graves, suggesting at least some pre-planning and Christian burials at this time. Before 1350, there were about 170,000 settlements in Germany, and this was reduced by nearly 40,000 by 1450. In 1348, the plague spread so rapidly that before any physicians or government authorities had time to reflect upon its origins, about a third of the European population had already perished. In crowded cities, it was not uncommon for as much as 50% of the population to die. The disease bypassed some areas, and the most isolated areas were less vulnerable to contagion. Monks and priests were especially hard hit since they cared for victims of the Black Death.\n\n## Section 5\n\nThe plague disease, caused by Yersinia pestis, is enzootic (commonly present) in populations of fleas carried by ground rodents, including marmots, in various areas including Central Asia, Kurdistan, Western Asia, Northern India and Uganda. Nestorian graves dating to 1338–39 near Lake Issyk Kul in Kyrgyzstan have inscriptions referring to plague and are thought by many epidemiologists to mark the outbreak of the epidemic, from which it could easily have spread to China and India. In October 2010, medical geneticists suggested that all three of the great waves of the plague originated in China. In China, the 13th century Mongol conquest caused a decline in farming and trading. However, economic recovery had been observed at the beginning of the 14th century. In the 1330s a large number of natural disasters and plagues led to widespread famine, starting in 1331, with a deadly plague arriving soon after. Epidemics that may have included plague killed an estimated 25 million Chinese and other Asians during the 15 years before it reached Constantinople in 1347.\n\n## Section 6\n\nIt is recognised that an epidemiological account of the plague is as important as an identification of symptoms, but researchers are hampered by the lack of reliable statistics from this period. Most work has been done on the spread of the plague in England, and even estimates of overall population at the start vary by over 100% as no census was undertaken between the time of publication of the Domesday Book and the year 1377. Estimates of plague victims are usually extrapolated from figures from the clergy.\n\n## Section 7\n\nOther forms of plague have been implicated by modern scientists. The modern bubonic plague has a mortality rate of 30–75% and symptoms including fever of 38–41 °C (100–106 °F), headaches, painful aching joints, nausea and vomiting, and a general feeling of malaise. Left untreated, of those that contract the bubonic plague, 80 percent die within eight days. Pneumonic plague has a mortality rate of 90 to 95 percent. Symptoms include fever, cough, and blood-tinged sputum. As the disease progresses, sputum becomes free flowing and bright red. Septicemic plague is the least common of the three forms, with a mortality rate near 100%. Symptoms are high fevers and purple skin patches (purpura due to disseminated intravascular coagulation). In cases of pneumonic and particularly septicemic plague, the progress of the disease is so rapid that there would often be no time for the development of the enlarged lymph nodes that were noted as buboes.\n\n## Section 8\n\nThe plague struck various countries in the Middle East during the pandemic, leading to serious depopulation and permanent change in both economic and social structures. As it spread to western Europe, the disease entered the region from southern Russia also. By autumn 1347, the plague reached Alexandria in Egypt, probably through the port's trade with Constantinople, and ports on the Black Sea. During 1347, the disease travelled eastward to Gaza, and north along the eastern coast to cities in Lebanon, Syria and Palestine, including Ashkelon, Acre, Jerusalem, Sidon, Damascus, Homs, and Aleppo. In 1348–49, the disease reached Antioch. The city's residents fled to the north, most of them dying during the journey, but the infection had been spread to the people of Asia Minor.[citation needed]\n\n## Section 9\n\nThe dominant explanation for the Black Death is the plague theory, which attributes the outbreak to Yersinia pestis, also responsible for an epidemic that began in southern China in 1865, eventually spreading to India. The investigation of the pathogen that caused the 19th-century plague was begun by teams of scientists who visited Hong Kong in 1894, among whom was the French-Swiss bacteriologist Alexandre Yersin, after whom the pathogen was named Yersinia pestis. The mechanism by which Y. pestis was usually transmitted was established in 1898 by Paul-Louis Simond and was found to involve the bites of fleas whose midguts had become obstructed by replicating Y. pestis several days after feeding on an infected host. This blockage results in starvation and aggressive feeding behaviour by the fleas, which repeatedly attempt to clear their blockage by regurgitation, resulting in thousands of plague bacteria being flushed into the feeding site, infecting the host. The bubonic plague mechanism was also dependent on two populations of rodents: one resistant to the disease, which act as hosts, keeping the disease endemic, and a second that lack resistance. When the second population dies, the fleas move on to other hosts, including people, thus creating a human epidemic.\n\n## Section 10\n\nMedical knowledge had stagnated during the Middle Ages. The most authoritative account at the time came from the medical faculty in Paris in a report to the king of France that blamed the heavens, in the form of a conjunction of three planets in 1345 that caused a \"great pestilence in the air\". This report became the first and most widely circulated of a series of plague tracts that sought to give advice to sufferers. That the plague was caused by bad air became the most widely accepted theory. Today, this is known as the Miasma theory. The word 'plague' had no special significance at this time, and only the recurrence of outbreaks during the Middle Ages gave it the name that has become the medical term.\n"
+    },
+    {
+      "filename": "07-imperialism.md",
+      "title": "Imperialism",
+      "article_index": 31,
+      "source_paragraphs": [
+        30,
+        36,
+        9,
+        10,
+        21,
+        7,
+        31,
+        13,
+        6,
+        1
+      ],
+      "content": "# Imperialism\n\n## Section 1\n\nBolshevik leaders had effectively reestablished a polity with roughly the same extent as that empire by 1921, however with an internationalist ideology: Lenin in particular asserted the right to limited self-determination for national minorities within the new territory. Beginning in 1923, the policy of \"Indigenization\" [korenizatsiia] was intended to support non-Russians develop their national cultures within a socialist framework. Never formally revoked, it stopped being implemented after 1932. After World War II, the Soviet Union installed socialist regimes modeled on those it had installed in 1919–20 in the old Tsarist Empire in areas its forces occupied in Eastern Europe. The Soviet Union and the People’s Republic of China supported post–World War II communist movements in foreign nations and colonies to advance their own interests, but were not always successful.\n\n## Section 2\n\nSome have described the internal strife between various people groups as a form of imperialism or colonialism. This internal form is distinct from informal U.S. imperialism in the form of political and financial hegemony. This internal form of imperialism is also distinct from the United States' formation of \"colonies\" abroad. Through the treatment of its indigenous peoples during westward expansion, the United States took on the form of an imperial power prior to any attempts at external imperialism. This internal form of empire has been referred to as \"internal colonialism\". Participation in the African slave trade and the subsequent treatment of its 12 to 15 million Africans is viewed by some to be a more modern extension of America's \"internal colonialism\". However, this internal colonialism faced resistance, as external colonialism did, but the anti-colonial presence was far less prominent due to the nearly complete dominance that the United States was able to assert over both indigenous peoples and African-Americans. In his lecture on April 16, 2003, Edward Said made a bold statement on modern imperialism in the United States, whom he described as using aggressive means of attack towards the contemporary Orient, \"due to their backward living, lack of democracy and the violation of women’s rights. The western world forgets during this process of converting the other that enlightenment and democracy are concepts that not all will agree upon\".\n\n## Section 3\n\nThe principles of imperialism are often generalizable to the policies and practices of the British Empire \"during the last generation, and proceeds rather by diagnosis than by historical description\". British imperialism often used the concept of Terra nullius (Latin expression which stems from Roman law meaning 'empty land'). The country of Australia serves as a case study in relation to British settlement and colonial rule of the continent in the eighteenth century, as it was premised on terra nullius, and its settlers considered it unused by its sparse Aboriginal inhabitants.\n\n## Section 4\n\nOrientalism, as theorized by Edward Said, refers to how the West developed an imaginative geography of the East. This imaginative geography relies on an essentializing discourse that represents neither the diversity nor the social reality of the East. Rather, by essentializing the East, this discourse uses the idea of place-based identities to create difference and distance between \"we\" the West and \"them\" the East, or \"here\" in the West and \"there\" in the East. This difference was particularly apparent in textual and visual works of early European studies of the Orient that positioned the East as irrational and backward in opposition to the rational and progressive West. Defining the East as a negative vision of itself, as its inferior, not only increased the West’s sense of self, but also was a way of ordering the East and making it known to the West so that it could be dominated and controlled. The discourse of Orientalism therefore served as an ideological justification of early Western imperialism, as it formed a body of knowledge and ideas that rationalized social, cultural, political, and economic control of other territories.\n\n## Section 5\n\nAccording to geographic scholars under colonizing empires, the world could be split into climatic zones. These scholars believed that Northern Europe and the Mid-Atlantic temperate climate produced a hard-working, moral, and upstanding human being. Alternatively, tropical climates yielded lazy attitudes, sexual promiscuity, exotic culture, and moral degeneracy. The people of these climates were believed to be in need of guidance and intervention from the European empire to aid in the governing of a more evolved social structure; they were seen as incapable of such a feat. Similarly, orientalism is a view of a people based on their geographical location. \n\n## Section 6\n\nThe Royal Geographical Society of London and other geographical societies in Europe had great influence and were able to fund travelers who would come back with tales of their discoveries. These societies also served as a space for travellers to share these stories.Political geographers such as Friedrich Ratzel of Germany and Halford Mackinder of Britain also supported imperialism. Ratzel believed expansion was necessary for a state’s survival while Mackinder supported Britain’s imperial expansion; these two arguments dominated the discipline for decades.\n\n## Section 7\n\nTrotsky, and others, believed that the revolution could only succeed in Russia as part of a world revolution. Lenin wrote extensively on the matter and famously declared that Imperialism was the highest stage of capitalism. However, after Lenin's death, Joseph Stalin established 'socialism in one country' for the Soviet Union, creating the model for subsequent inward looking Stalinist states and purging the early Internationalist elements. The internationalist tendencies of the early revolution would be abandoned until they returned in the framework of a client state in competition with the Americans during the Cold War. With the beginning of the new era, the after Stalin period called the \"thaw\", in the late 1950s, the new political leader Nikita Khrushchev put even more pressure on the Soviet-American relations starting a new wave of anti-imperialist propaganda. In his speech on the UN conference in 1960, he announced the continuation of the war on imperialism, stating that soon the people of different countries will come together and overthrow their imperialist leaders. Although the Soviet Union declared itself anti-imperialist, critics argue that it exhibited tendencies common to historic empires. Some scholars hold that the Soviet Union was a hybrid entity containing elements common to both multinational empires and nation states. It has also been argued that the USSR practiced colonialism as did other imperial powers and was carrying on the old Russian tradition of expansion and control. Mao Zedong once argued that the Soviet Union had itself become an imperialist power while maintaining a socialist façade. Moreover, the ideas of imperialism were widely spread in action on the higher levels of government. Non Russian Marxists within the Russian Federation and later the USSR, like Sultan Galiev and Vasyl Shakhrai, considered the Soviet Regime a renewed version of the Russian imperialism and colonialism.\n\n## Section 8\n\nCultural imperialism is when a country's influence is felt in social and cultural circles, i.e. its soft power, such that it changes the moral, cultural and societal worldview of another. This is more than just \"foreign\" music, television or film becoming popular with young people, but that popular culture changing their own expectations of life and their desire for their own country to become more like the foreign country depicted. For example, depictions of opulent American lifestyles in the soap opera Dallas during the Cold War changed the expectations of Romanians; a more recent example is the influence of smuggled South Korean drama series in North Korea. The importance of soft power is not lost on authoritarian regimes, fighting such influence with bans on foreign popular culture, control of the internet and unauthorised satellite dishes etc. Nor is such a usage of culture recent, as part of Roman imperialism local elites would be exposed to the benefits and luxuries of Roman culture and lifestyle, with the aim that they would then become willing participants.\n\n## Section 9\n\nA controversial aspect of imperialism is the defense and justification of empire-building based on seemingly rational grounds. J. A. Hobson identifies this justification on general grounds as: \"It is desirable that the earth should be peopled, governed, and developed, as far as possible, by the races which can do this work best, i.e. by the races of highest 'social efficiency'\". Many others argued that imperialism is justified for several different reasons. Friedrich Ratzel believed that in order for a state to survive, imperialism was needed. Halford Mackinder felt that Great Britain needed to be one of the greatest imperialists and therefore justified imperialism. The purportedly scientific nature of \"Social Darwinism\" and a theory of races formed a supposedly rational justification for imperialism. The rhetoric of colonizers being racially superior appears to have achieved its purpose, for example throughout Latin America \"whiteness\" is still prized today and various forms of blanqueamiento (whitening) are common.\n\n## Section 10\n\nImperialism is defined as \"A policy of extending a country’s power and influence through diplomacy or military force.\" Imperialism is particularly focused on the control that one group, often a state power, has on another group of people. This is often through various forms of \"othering\" (see other) based on racial, religious, or cultural stereotypes. There are \"formal\" or \"informal\" imperialisms. \"Formal imperialism\" is defined as \"physical control or full-fledged colonial rule\". \"Informal imperialism\" is less direct; however, it is still a powerful form of dominance.\n"
+    },
+    {
+      "filename": "08-yuan-dynasty.md",
+      "title": "Yuan_dynasty",
+      "article_index": 24,
+      "source_paragraphs": [
+        5,
+        12,
+        14,
+        23,
+        20,
+        16,
+        27,
+        30,
+        9,
+        40
+      ],
+      "content": "# Yuan dynasty\n\n## Section 1\n\nShi Tianze was a Han Chinese who lived in the Jin dynasty. Interethnic marriage between Han and Jurchen became common at this time. His father was Shi Bingzhi (史秉直, Shih Ping-chih). Shi Bingzhi was married to a Jurchen woman (surname Na-ho) and a Han Chinese woman (surname Chang); it is unknown which of them was Shi Tianze's mother. Shi Tianze was married to two Jurchen women, a Han Chinese woman, and a Korean woman, and his son Shi Gang was born to one of his Jurchen wives. The surnames of his Jurchen wives were Mo-nien and Na-ho; the surname of his Korean wife was Li; and the surname of his Han Chinese wife was Shi. Shi Tianze defected to Mongol forces upon their invasion of the Jin dynasty. His son Shi Gang married a Kerait woman; the Kerait were Mongolified Turkic people and were considered part of the \"Mongol nation\". Shi Tianze (Shih T'ien-tse), Zhang Rou (Chang Jou, 張柔), and Yan Shi (Yen Shih, 嚴實) and other high ranking Chinese who served in the Jin dynasty and defected to the Mongols helped build the structure for the administration of the new state. Chagaan (Tsagaan) and Zhang Rou jointly launched an attack on the Song dynasty ordered by Töregene Khatun.\n\n## Section 2\n\nAfter strengthening his government in northern China, Kublai pursued an expansionist policy in line with the tradition of Mongol and Chinese imperialism. He renewed a massive drive against the Song dynasty to the south. Kublai besieged Xiangyang between 1268 and 1273, the last obstacle in his way to capture the rich Yangzi River basin. An unsuccessful naval expedition was undertaken against Japan in 1274. Kublai captured the Song capital of Hangzhou in 1276, the wealthiest city of China. Song loyalists escaped from the capital and enthroned a young child as Emperor Bing of Song. The Mongols defeated the loyalists at the battle of Yamen in 1279. The last Song emperor drowned, bringing an end to the Song dynasty. The conquest of the Song reunited northern and southern China for the first time in three hundred years.\n\n## Section 3\n\nFollowing the conquest of Dali in 1253, the former ruling Duan dynasty were appointed as governors-general, recognized as imperial officials by the Yuan, Ming, and Qing-era governments, principally in the province of Yunnan. Succession for the Yuan dynasty, however, was an intractable problem, later causing much strife and internal struggle. This emerged as early as the end of Kublai's reign. Kublai originally named his eldest son, Zhenjin, as the Crown Prince, but he died before Kublai in 1285. Thus, Zhenjin's third son, with the support of his mother Kökejin and the minister Bayan, succeeded the throne and ruled as Temür Khan, or Emperor Chengzong, from 1294 to 1307. Temür Khan decided to maintain and continue much of the work begun by his grandfather. He also made peace with the western Mongol khanates as well as neighboring countries such as Vietnam, which recognized his nominal suzerainty and paid tributes for a few decades. However, the corruption in the Yuan dynasty began during the reign of Temür Khan.\n\n## Section 4\n\nWestern musical instruments were introduced to enrich Chinese performing arts. From this period dates the conversion to Islam, by Muslims of Central Asia, of growing numbers of Chinese in the northwest and southwest. Nestorianism and Roman Catholicism also enjoyed a period of toleration. Buddhism (especially Tibetan Buddhism) flourished, although Taoism endured certain persecutions in favor of Buddhism from the Yuan government. Confucian governmental practices and examinations based on the Classics, which had fallen into disuse in north China during the period of disunity, were reinstated by the Yuan court, probably in the hope of maintaining order over Han society. Advances were realized in the fields of travel literature, cartography, geography, and scientific education.\n\n## Section 5\n\nThe final years of the Yuan dynasty were marked by struggle, famine, and bitterness among the populace. In time, Kublai Khan's successors lost all influence on other Mongol lands across Asia, while the Mongols beyond the Middle Kingdom saw them as too Chinese. Gradually, they lost influence in China as well. The reigns of the later Yuan emperors were short and marked by intrigues and rivalries. Uninterested in administration, they were separated from both the army and the populace, and China was torn by dissension and unrest. Outlaws ravaged the country without interference from the weakening Yuan armies.\n\n## Section 6\n\nEmperor Gegeen Khan, Ayurbarwada's son and successor, ruled for only two years, from 1321 to 1323. He continued his father's policies to reform the government based on the Confucian principles, with the help of his newly appointed grand chancellor Baiju. During his reign, the Da Yuan Tong Zhi (Chinese: 大元通制, \"the comprehensive institutions of the Great Yuan\"), a huge collection of codes and regulations of the Yuan dynasty begun by his father, was formally promulgated. Gegeen was assassinated in a coup involving five princes from a rival faction, perhaps steppe elite opposed to Confucian reforms. They placed Yesün Temür (or Taidingdi) on the throne, and, after an unsuccessful attempt to calm the princes, he also succumbed to regicide.\n\n## Section 7\n\nThe system of bureaucracy created by Kublai Khan reflected various cultures in the empire, including that of the Han Chinese, Khitans, Jurchens, Mongols, and Tibetan Buddhists. While the official terminology of the institutions may indicate the government structure was almost purely that of native Chinese dynasties, the Yuan bureaucracy actually consisted of a mix of elements from different cultures. The Chinese-style elements of the bureaucracy mainly came from the native Tang, Song, as well as Khitan Liao and Jurchen Jin dynasties. Chinese advisers such as Liu Bingzhong and Yao Shu gave strong influence to Kublai's early court, and the central government administration was established within the first decade of Kublai's reign. This government adopted the traditional Chinese tripartite division of authority among civil, military, and censorial offices, including the Central Secretariat (Zhongshu Sheng) to manage civil affairs, the Privy Council (Chinese: 樞密院) to manage military affairs, and the Censorate to conduct internal surveillance and inspection. The actual functions of both central and local government institutions, however, showed a major overlap between the civil and military jurisdictions, due to the Mongol traditional reliance on military institutions and offices as the core of governance. Nevertheless, such a civilian bureaucracy, with the Central Secretariat as the top institution that was (directly or indirectly) responsible for most other governmental agencies (such as the traditional Chinese-style Six Ministries), was created in China. At various times another central government institution called the Department of State Affairs (Shangshu Sheng) that mainly dealt with finance was established (such as during the reign of Külüg Khan or Emperor Wuzong), but was usually abandoned shortly afterwards.\n\n## Section 8\n\nThe average Mongol garrison family of the Yuan dynasty seems to have lived a life of decaying rural leisure, with income from the harvests of their Chinese tenants eaten up by costs of equipping and dispatching men for their tours of duty. The Mongols practiced debt slavery, and by 1290 in all parts of the Mongol Empire commoners were selling their children into slavery. Seeing this as damaging to the Mongol nation, Kublai in 1291 forbade the sale abroad of Mongols. Kublai wished to persuade the Chinese that he was becoming increasingly sinicized while maintaining his Mongolian credentials with his own people. He set up a civilian administration to rule, built a capital within China, supported Chinese religions and culture, and devised suitable economic and political institutions for the court. But at the same time he never abandoned his Mongolian heritage.\n\n## Section 9\n\nKublai readied the move of the Mongol capital from Karakorum in Mongolia to Khanbaliq in 1264, constructing a new city near the former Jurchen capital Zhongdu, now modern Beijing, in 1266. In 1271, Kublai formally claimed the Mandate of Heaven and declared that 1272 was the first year of the Great Yuan (Chinese: 大元) in the style of a traditional Chinese dynasty. The name of the dynasty originated from the I Ching and describes the \"origin of the universe\" or a \"primal force\". Kublai proclaimed Khanbaliq the \"Great Capital\" or Daidu (Dadu, Chinese: 大都 in Chinese) of the dynasty. The era name was changed to Zhiyuan to herald a new era of Chinese history. The adoption of a dynastic name legitimized Mongol rule by integrating the government into the narrative of traditional Chinese political succession. Khublai evoked his public image as a sage emperor by following the rituals of Confucian propriety and ancestor veneration, while simultaneously retaining his roots as a leader from the steppes.\n\n## Section 10\n\nPolitically, the system of government created by Kublai Khan was the product of a compromise between Mongolian patrimonial feudalism and the traditional Chinese autocratic-bureaucratic system. Nevertheless, socially the educated Chinese elite were in general not given the degree of esteem that they had been accorded previously under native Chinese dynasties. Although the traditional Chinese elite were not given their share of power, the Mongols and the Semuren (various allied groups from Central Asia and the western end of the empire) largely remained strangers to the mainstream Chinese culture, and this dichotomy gave the Yuan regime a somewhat strong \"colonial\" coloration. The unequal treatment is possibly due to the fear of transferring power to the ethnic Chinese under their rule. The Mongols and Semuren were given certain advantages in the dynasty, and this would last even after the restoration of the imperial examination in the early 14th century. In general there were very few North Chinese or Southerners reaching the highest-post in the government compared with the possibility that Persians did so in the Ilkhanate. Later the Yongle Emperor of the Ming dynasty also mentioned the discrimination that existed during the Yuan dynasty. In response to an objection against the use of \"barbarians\" in his government, the Yongle Emperor answered: \"... Discrimination was used by the Mongols during the Yuan dynasty, who employed only \"Mongols and Tartars\" and discarded northern and southern Chinese and this was precisely the cause that brought disaster upon them\".\n"
+    },
+    {
+      "filename": "09-packet-switching.md",
+      "title": "Packet_switching",
+      "article_index": 13,
+      "source_paragraphs": [
+        0,
+        14,
+        19,
+        6,
+        16,
+        2,
+        15,
+        5,
+        22,
+        3
+      ],
+      "content": "# Packet switching\n\n## Section 1\n\nStarting in the late 1950s, American computer scientist Paul Baran developed the concept Distributed Adaptive Message Block Switching with the goal to provide a fault-tolerant, efficient routing method for telecommunication messages as part of a research program at the RAND Corporation, funded by the US Department of Defense. This concept contrasted and contradicted the theretofore established principles of pre-allocation of network bandwidth, largely fortified by the development of telecommunications in the Bell System. The new concept found little resonance among network implementers until the independent work of Donald Davies at the National Physical Laboratory (United Kingdom) (NPL) in the late 1960s. Davies is credited with coining the modern name packet switching and inspiring numerous packet switching networks in Europe in the decade following, including the incorporation of the concept in the early ARPANET in the United States.\n\n## Section 2\n\nTelenet was the first FCC-licensed public data network in the United States. It was founded by former ARPA IPTO director Larry Roberts as a means of making ARPANET technology public. He had tried to interest AT&T in buying the technology, but the monopoly's reaction was that this was incompatible with their future. Bolt, Beranack and Newman (BBN) provided the financing. It initially used ARPANET technology but changed the host interface to X.25 and the terminal interface to X.29. Telenet designed these protocols and helped standardize them in the CCITT. Telenet was incorporated in 1973 and started operations in 1975. It went public in 1979 and was then sold to GTE.\n\n## Section 3\n\nThe Computer Science Network (CSNET) was a computer network funded by the U.S. National Science Foundation (NSF) that began operation in 1981. Its purpose was to extend networking benefits, for computer science departments at academic and research institutions that could not be directly connected to ARPANET, due to funding or authorization limitations. It played a significant role in spreading awareness of, and access to, national networking and was a major milestone on the path to development of the global Internet.\n\n## Section 4\n\nConnection-oriented transmission requires a setup phase in each involved node before any packet is transferred to establish the parameters of communication. The packets include a connection identifier rather than address information and are negotiated between endpoints so that they are delivered in order and with error checking. Address information is only transferred to each node during the connection set-up phase, when the route to the destination is discovered and an entry is added to the switching table in each network node through which the connection passes. The signaling protocols used allow the application to specify its requirements and discover link parameters. Acceptable values for service parameters may be negotiated. Routing a packet requires the node to look up the connection id in a table. The packet header can be small, as it only needs to contain this code and any information, such as length, timestamp, or sequence number, which is different for different packets.\n\n## Section 5\n\nThere were two kinds of X.25 networks. Some such as DATAPAC and TRANSPAC were initially implemented with an X.25 external interface. Some older networks such as TELENET and TYMNET were modified to provide a X.25 host interface in addition to older host connection schemes. DATAPAC was developed by Bell Northern Research which was a joint venture of Bell Canada (a common carrier) and Northern Telecom (a telecommunications equipment supplier). Northern Telecom sold several DATAPAC clones to foreign PTTs including the Deutsche Bundespost. X.75 and X.121 allowed the interconnection of national X.25 networks. A user or host could call a host on a foreign network by including the DNIC of the remote network as part of the destination address.[citation needed]\n\n## Section 6\n\nPacket mode communication may be implemented with or without intermediate forwarding nodes (packet switches or routers). Packets are normally forwarded by intermediate network nodes asynchronously using first-in, first-out buffering, but may be forwarded according to some scheduling discipline for fair queuing, traffic shaping, or for differentiated or guaranteed quality of service, such as weighted fair queuing or leaky bucket. In case of a shared physical medium (such as radio or 10BASE5), the packets may be delivered according to a multiple access scheme.\n\n## Section 7\n\nTymnet was an international data communications network headquartered in San Jose, CA that utilized virtual call packet switched technology and used X.25, SNA/SDLC, BSC and ASCII interfaces to connect host computers (servers)at thousands of large companies, educational institutions, and government agencies. Users typically connected via dial-up connections or dedicated async connections. The business consisted of a large public network that supported dial-up users and a private network business that allowed government agencies and large companies (mostly banks and airlines) to build their own dedicated networks. The private networks were often connected via gateways to the public network to reach locations not on the private network. Tymnet was also connected to dozens of other public networks in the U.S. and internationally via X.25/X.75 gateways. (Interesting note: Tymnet was not named after Mr. Tyme. Another employee suggested the name.)  \n\n## Section 8\n\nIn connectionless mode each packet includes complete addressing information. The packets are routed individually, sometimes resulting in different paths and out-of-order delivery. Each packet is labeled with a destination address, source address, and port numbers. It may also be labeled with the sequence number of the packet. This precludes the need for a dedicated path to help the packet find its way to its destination, but means that much more information is needed in the packet header, which is therefore larger, and this information needs to be looked up in power-hungry content-addressable memory. Each packet is dispatched and may go via different routes; potentially, the system has to do as much work for every packet as the connection-oriented system has to do in connection set-up, but with less information as to the application's requirements. At the destination, the original message/data is reassembled in the correct order, based on the packet sequence number. Thus a virtual connection, also known as a virtual circuit or byte stream is provided to the end-user by a transport layer protocol, although intermediate network nodes only provides a connectionless network layer service.\n\n## Section 9\n\nThe Very high-speed Backbone Network Service (vBNS) came on line in April 1995 as part of a National Science Foundation (NSF) sponsored project to provide high-speed interconnection between NSF-sponsored supercomputing centers and select access points in the United States. The network was engineered and operated by MCI Telecommunications under a cooperative agreement with the NSF. By 1998, the vBNS had grown to connect more than 100 universities and research and engineering institutions via 12 national points of presence with DS-3 (45 Mbit/s), OC-3c (155 Mbit/s), and OC-12c (622 Mbit/s) links on an all OC-12c backbone, a substantial engineering feat for that time. The vBNS installed one of the first ever production OC-48c (2.5 Gbit/s) IP links in February 1999 and went on to upgrade the entire backbone to OC-48c.\n\n## Section 10\n\nBaran developed the concept of distributed adaptive message block switching during his research at the RAND Corporation for the US Air Force into survivable communications networks, first presented to the Air Force in the summer of 1961 as briefing B-265, later published as RAND report P-2626 in 1962, and finally in report RM 3420 in 1964. Report P-2626 described a general architecture for a large-scale, distributed, survivable communications network. The work focuses on three key ideas: use of a decentralized network with multiple paths between any two points, dividing user messages into message blocks, later called packets, and delivery of these messages by store and forward switching.\n"
+    },
+    {
+      "filename": "10-1973-oil-crisis.md",
+      "title": "1973_oil_crisis",
+      "article_index": 8,
+      "source_paragraphs": [
+        19,
+        18,
+        0,
+        14,
+        20,
+        9,
+        21,
+        3,
+        17,
+        1
+      ],
+      "content": "# 1973 oil crisis\n\n## Section 1\n\nSome buyers lamented the small size of the first Japanese compacts, and both Toyota and Nissan (then known as Datsun) introduced larger cars such as the Toyota Corona Mark II, the Toyota Cressida, the Mazda 616 and Datsun 810, which added passenger space and amenities such as air conditioning, power steering, AM-FM radios, and even power windows and central locking without increasing the price of the vehicle. A decade after the 1973 oil crisis, Honda, Toyota and Nissan, affected by the 1981 voluntary export restraints, opened US assembly plants and established their luxury divisions (Acura, Lexus and Infiniti, respectively) to distinguish themselves from their mass-market brands.\n\n## Section 2\n\nThe crisis reduced the demand for large cars. Japanese imports, primarily the Toyota Corona, the Toyota Corolla, the Datsun B210, the Datsun 510, the Honda Civic, the Mitsubishi Galant (a captive import from Chrysler sold as the Dodge Colt), the Subaru DL, and later the Honda Accord all had four cylinder engines that were more fuel efficient than the typical American V8 and six cylinder engines. Japanese imports became mass-market leaders with unibody construction and front-wheel drive, which became de facto standards.\n\n## Section 3\n\nThe 1973 oil crisis began in October 1973 when the members of the Organization of Arab Petroleum Exporting Countries (OAPEC, consisting of the Arab members of OPEC plus Egypt and Syria) proclaimed an oil embargo. By the end of the embargo in March 1974, the price of oil had risen from US$3 per barrel to nearly $12 globally; US prices were significantly higher. The embargo caused an oil crisis, or \"shock\", with many short- and long-term effects on global politics and the global economy. It was later called the \"first oil shock\", followed by the 1979 oil crisis, termed the \"second oil shock.\"\n\n## Section 4\n\nThe energy crisis led to greater interest in renewable energy, nuclear power and domestic fossil fuels. There is criticism that American energy policies since the crisis have been dominated by crisis-mentality thinking, promoting expensive quick fixes and single-shot solutions that ignore market and technology realities. Instead of providing stable rules that support basic research while leaving plenty of scope for entrepreneurship and innovation, congresses and presidents have repeatedly backed policies which promise solutions that are politically expedient, but whose prospects are doubtful.\n\n## Section 5\n\nCompact trucks were introduced, such as the Toyota Hilux and the Datsun Truck, followed by the Mazda Truck (sold as the Ford Courier), and the Isuzu-built Chevrolet LUV. Mitsubishi rebranded its Forte as the Dodge D-50 a few years after the oil crisis. Mazda, Mitsubishi and Isuzu had joint partnerships with Ford, Chrysler, and GM, respectively. Later the American makers introduced their domestic replacements (Ford Ranger, Dodge Dakota and the Chevrolet S10/GMC S-15), ending their captive import policy.\n\n## Section 6\n\nThe embargo was not uniform across Europe. Of the nine members of the European Economic Community (EEC), the Netherlands faced a complete embargo, the UK and France received almost uninterrupted supplies (having refused to allow America to use their airfields and embargoed arms and supplies to both the Arabs and the Israelis), while the other six faced partial cutbacks. The UK had traditionally been an ally of Israel, and Harold Wilson's government supported the Israelis during the Six-Day War. His successor, Ted Heath, reversed this policy in 1970, calling for Israel to withdraw to its pre-1967 borders.\n\n## Section 7\n\nAn increase in imported cars into North America forced General Motors, Ford and Chrysler to introduce smaller and fuel-efficient models for domestic sales. The Dodge Omni / Plymouth Horizon from Chrysler, the Ford Fiesta and the Chevrolet Chevette all had four-cylinder engines and room for at least four passengers by the late 1970s. By 1985, the average American vehicle moved 17.4 miles per gallon, compared to 13.5 in 1970. The improvements stayed even though the price of a barrel of oil remained constant at $12 from 1974 to 1979. Sales of large sedans for most makes (except Chrysler products) recovered within two model years of the 1973 crisis. The Cadillac DeVille and Fleetwood, Buick Electra, Oldsmobile 98, Lincoln Continental, Mercury Marquis, and various other luxury oriented sedans became popular again in the mid-1970s. The only full-size models that did not recover were lower price models such as the Chevrolet Bel Air, and Ford Galaxie 500. Slightly smaller, mid-size models such as the Oldsmobile Cutlass, Chevrolet Monte Carlo, Ford Thunderbird and various other models sold well.\n\n## Section 8\n\nThis contributed to the \"Oil Shock\". After 1971, OPEC was slow to readjust prices to reflect this depreciation. From 1947 to 1967, the dollar price of oil had risen by less than two percent per year. Until the oil shock, the price had also remained fairly stable versus other currencies and commodities. OPEC ministers had not developed institutional mechanisms to update prices in sync with changing market conditions, so their real incomes lagged. The substantial price increases of 1973–1974 largely returned their prices and corresponding incomes to Bretton Woods levels in terms of commodities such as gold.\n\n## Section 9\n\nThe USSR's invasion of Afghanistan was only one sign of insecurity in the region, also marked by increased American weapons sales, technology, and outright military presence. Saudi Arabia and Iran became increasingly dependent on American security assurances to manage both external and internal threats, including increased military competition between them over increased oil revenues. Both states were competing for preeminence in the Persian Gulf and using increased revenues to fund expanded militaries. By 1979, Saudi arms purchases from the US exceeded five times Israel's. Another motive for the large scale purchase of arms from the US by Saudi Arabia was the failure of the Shah during January 1979 to maintain control of Iran, a non-Arabic but largely Shiite Muslim nation, which fell to a theocratic Islamist government under the Ayatollah Ruhollah Khomeini in the wake of the 1979 Iranian Revolution. Saudi Arabia, on the other hand, is an Arab, largely Sunni Muslim nation headed by a near absolutist monarchy. In the wake of the Iranian revolution the Saudis were forced to deal with the prospect of internal destabilization via the radicalism of Islamism, a reality which would quickly be revealed in the seizure of the Grand Mosque in Mecca by Wahhabi extremists during November 1979 and a Shiite revolt in the oil rich Al-Hasa region of Saudi Arabia in December of the same year. In November 2010, Wikileaks leaked confidential diplomatic cables pertaining to the United States and its allies which revealed that the late Saudi King Abdullah urged the United States to attack Iran in order to destroy its potential nuclear weapons program, describing Iran as \"a snake whose head should be cut off without any procrastination.\"\n\n## Section 10\n\nThe crisis had a major impact on international relations and created a rift within NATO. Some European nations and Japan sought to disassociate themselves from United States foreign policy in the Middle East to avoid being targeted by the boycott. Arab oil producers linked any future policy changes to peace between the belligerents. To address this, the Nixon Administration began multilateral negotiations with the combatants. They arranged for Israel to pull back from the Sinai Peninsula and the Golan Heights. By January 18, 1974, US Secretary of State Henry Kissinger had negotiated an Israeli troop withdrawal from parts of the Sinai Peninsula. The promise of a negotiated settlement between Israel and Syria was enough to convince Arab oil producers to lift the embargo in March 1974.\n"
+    }
+  ],
+  "queries": [
+    {
+      "id": "held-out-5726472bdd62a815002e8045",
+      "question": "Who did internet2 partner with ",
+      "expected_document": null,
+      "answers": [
+        "a partnership with Level 3 Communications to launch a brand new nationwide network",
+        "Level 3 Communications",
+        "Qwest"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "09-packet-switching.md",
+      "withheld_paragraph": 20
+    },
+    {
+      "id": "57281bb84b864d190016449c",
+      "question": "What was the proposed solution to Jacksonville's tax issues?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "annexing outlying communities"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 11
+    },
+    {
+      "id": "5706143575f01819005e7953",
+      "question": "What is the other NHL team aside from the Anaheim Ducks to reside in Southern California?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "Los Angeles Kings"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 35
+    },
+    {
+      "id": "5726431aec44d21400f3dd15",
+      "question": "How did user of Tymnet connect ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "connected via dial-up connections or dedicated async connections",
+        "dial-up connections or dedicated async connections",
+        "dial-up"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 15
+    },
+    {
+      "id": "held-out-56e1b8f3e3433e14004230e6",
+      "question": "What are the three primary expressions used to represent case complexity?",
+      "expected_document": null,
+      "answers": [
+        "best, worst and average",
+        "best, worst and average case",
+        "best, worst and average case complexity"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "01-computational-complexity-theory.md",
+      "withheld_paragraph": 19
+    },
+    {
+      "id": "56e200e4cd28a01900c67c16",
+      "question": "What theoretical device is attributed to Alan Turing?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "Turing machines"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 43
+    },
+    {
+      "id": "5726398589a1e219009ac588",
+      "question": "What does connection orientation require",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "a setup phase in each involved node before any packet is transferred to establish the parameters of communication",
+        "a setup phase in each involved node",
+        "setup phase"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 6
+    },
+    {
+      "id": "5726249538643c19005ad082",
+      "question": "How are Air force messages delivered ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "delivery of these messages by store and forward switching",
+        "decentralized network with multiple paths between any two points",
+        "store and forward switching"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 3
+    },
+    {
+      "id": "572a0a686aef0514001551ef",
+      "question": "What two scientists were proponents of the humoral theory of immunity?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "Robert Koch and Emil von Behring",
+        "Robert Koch and Emil von Behring,"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 39
+    },
+    {
+      "id": "5729f1fcaf94a219006aa6d7",
+      "question": "What class of T cells recognizes intact antigens that are not associated with MHC receptors?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "γδ T cells",
+        "γδ"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 16
+    },
+    {
+      "id": "5705f7c875f01819005e77dc",
+      "question": "Where does southern California's megalopolis standard in terms of population nationwide?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "third"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "572647935951b619008f6ecd",
+      "question": "How many did this epidemic in China kill?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "an estimated 25 million",
+        "25 million"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 1
+    },
+    {
+      "id": "held-out-572824f13acd2414000df592",
+      "question": "What is the scale used to measure the strength of hurricanes called?",
+      "expected_document": null,
+      "answers": [
+        "Saffir-Simpson Scale",
+        "Saffir-Simpson"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "03-jacksonville-florida.md",
+      "withheld_paragraph": 18
+    },
+    {
+      "id": "held-out-57287ccb2ca10214002da3db",
+      "question": "What did Mongols worship?",
+      "expected_document": null,
+      "answers": [
+        "the Eternal Heaven",
+        "Eternal Heaven"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "08-yuan-dynasty.md",
+      "withheld_paragraph": 26
+    },
+    {
+      "id": "57265bdfdd62a815002e829f",
+      "question": "How many passengers can the Ford Fiesta accommodate?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "at least four passengers",
+        "four",
+        "at least four"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 21
+    },
+    {
+      "id": "57264228ec44d21400f3dcf5",
+      "question": "What was telenet ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "the first FCC-licensed public data network in the United States",
+        "first FCC-licensed public data network"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "5730b4282461fd1900a9cfc7",
+      "question": "What policy did Stalin implement shortly after Lenin's Death?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "socialism in one country",
+        "socialism",
+        "socialism in one country'"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 31
+    },
+    {
+      "id": "held-out-57060a6e52bb8914006897f8",
+      "question": "What type of district is southern California home to many of?",
+      "expected_document": null,
+      "answers": [
+        "business",
+        "major business"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "05-southern-california.md",
+      "withheld_paragraph": 26
+    },
+    {
+      "id": "57282358ff5b5019007d9ddf",
+      "question": "What is a common occurrence during summer days?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "thunderstorms"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 17
+    },
+    {
+      "id": "57284142ff5b5019007da00a",
+      "question": "Who donated property to the University of Chicago?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "Marshall Field"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 3
+    },
+    {
+      "id": "5728f2e26aef051400154897",
+      "question": "What is the term for a hyperactive immune system that attacks normal tissues?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "autoimmunity"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 1
+    },
+    {
+      "id": "572872822ca10214002da376",
+      "question": "Who were later Yuan emperors isolated from?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "both the army and the populace",
+        "army and the populace",
+        "the army and the populace"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 20
+    },
+    {
+      "id": "570602fa52bb8914006897a0",
+      "question": "Cities that anchor the regions are often the hub for what kind of activity?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "economic",
+        "economic activity"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 20
+    },
+    {
+      "id": "57308ddc396df919000961a4",
+      "question": "Imperialism is most often associated with which sovereignty?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "the British Empire",
+        "Terra nullius",
+        "British Empire",
+        "British"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "5705eee952bb8914006896de",
+      "question": "Which country used to rule California?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "Mexico"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 10
+    },
+    {
+      "id": "572648ed5951b619008f6f05",
+      "question": "What types of European groups were able to avoid the plague?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "parts of Europe that had smaller trade relations with their neighbours",
+        "smaller trade relations with their neighbours"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 3
+    },
+    {
+      "id": "572826634b864d19001645c1",
+      "question": "What Jacksonville community is known for having heavy ties to the Navy?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "Filipino",
+        "Filipino community"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 19
+    },
+    {
+      "id": "held-out-56e1ded7cd28a01900c67bd4",
+      "question": "Who demonstrated that P= NP implies problems not present in P or NP-complete?",
+      "expected_document": null,
+      "answers": [
+        "Ladner"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "01-computational-complexity-theory.md",
+      "withheld_paragraph": 35
+    },
+    {
+      "id": "held-out-572867d72ca10214002da2ff",
+      "question": "Where did Korea border Kublai's territory?",
+      "expected_document": null,
+      "answers": [
+        "northeast",
+        "the northeast"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "08-yuan-dynasty.md",
+      "withheld_paragraph": 7
+    },
+    {
+      "id": "56e1c9bfe3433e1400423196",
+      "question": "Polynomial time reductions are an example of what?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "the bound on the complexity of reductions",
+        "types of reductions"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 29
+    },
+    {
+      "id": "57286010ff5b5019007da1cc",
+      "question": "What was the name of the experiment that tested how life originated?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "Miller–Urey experiment",
+        "Chicago Pile-1"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 19
+    },
+    {
+      "id": "56e1c720e3433e140042316e",
+      "question": "What kind of statement is made in the effort of establishing the time and space requirements needed to enhance the ultimate number of problems solved?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "quantitative statements",
+        "quantitative"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 27
+    },
+    {
+      "id": "572820512ca10214002d9e76",
+      "question": "What town is surrounded by Jacksonville?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "Baldwin"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "5729f12e3f37b319004785e1",
+      "question": "In what types of organisms did the adaptive immune system first evolve?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "vertebrates",
+        "early vertebrates"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 15
+    },
+    {
+      "id": "5726462b708984140094c117",
+      "question": "What is CSNET",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "The Computer Science Network",
+        "a computer network funded by the U.S. National Science Foundation (NSF)",
+        "Computer Science Network"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 19
+    },
+    {
+      "id": "572a0f073f37b31900478683",
+      "question": "What are the skin cells that can be transformed into tumors known as?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "melanocytes"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 44
+    },
+    {
+      "id": "573062662461fd1900a9cdfb",
+      "question": "Informal imperialism is still dominant; however, less what?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "direct"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 1
+    },
+    {
+      "id": "57287ee3ff5b5019007da276",
+      "question": "How were the Mongol garrison families earning money?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "income from the harvests of their Chinese tenants",
+        "harvests of their Chinese tenants"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 30
+    },
+    {
+      "id": "5705fb7f52bb891400689752",
+      "question": "Who considers Los Angeles County to be a separate metropolitan area?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "United States Census Bureau",
+        "the United States Census Bureau"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 15
+    },
+    {
+      "id": "5706149552bb891400689883",
+      "question": "What was the name of the stadium that the teams played in?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "StubHub Center",
+        "the StubHub Center"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 36
+    },
+    {
+      "id": "held-out-570607f575f01819005e78b6",
+      "question": "How many cities in southern California have over 200,000 residents?",
+      "expected_document": null,
+      "answers": [
+        "twelve"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "05-southern-california.md",
+      "withheld_paragraph": 23
+    },
+    {
+      "id": "5706094b52bb8914006897e1",
+      "question": "Southern California's economy can be described as one of the largest in the United States and what other characteristic?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "diverse"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 24
+    },
+    {
+      "id": "57264d58f1498d1400e8db7b",
+      "question": "How high do plague fevers run?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "100–106 °F",
+        "38–41 °C",
+        "41 °C"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "5705e63175f01819005e7720",
+      "question": "The cities of Los Angeles and San Diego are a part of which state?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "California"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 4
+    },
+    {
+      "id": "5728128cff5b5019007d9c78",
+      "question": "After what battle did Union forces return to and occupy Jacksonville for the rest of the war?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "Battle of Olustee"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 6
+    },
+    {
+      "id": "572870b2ff5b5019007da222",
+      "question": "What Nobel Memorial Prize in Economic Sciences winner is also a university alumni member?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "Milton Friedman"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 32
+    },
+    {
+      "id": "held-out-57265285708984140094c25e",
+      "question": "Was the bubonic plague spread faster or slower than modern bubonic plague?",
+      "expected_document": null,
+      "answers": [
+        "the Black Death was much faster than that of modern bubonic plague",
+        "faster"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "06-black-death.md",
+      "withheld_paragraph": 15
+    },
+    {
+      "id": "57264b3edd62a815002e80ad",
+      "question": "What is the bad air theory officially known as?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "Miasma theory",
+        "Miasma theory."
+      ],
+      "kind": "answerable",
+      "source_paragraph": 6
+    },
+    {
+      "id": "572821274b864d1900164512",
+      "question": "How tall is the Bank of America Tower?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "617 ft",
+        "617 ft ("
+      ],
+      "kind": "answerable",
+      "source_paragraph": 15
+    },
+    {
+      "id": "5726356938643c19005ad300",
+      "question": "How are packets normally forwarded",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "by intermediate network nodes asynchronously using first-in, first-out buffering, but may be forwarded according to some scheduling discipline for fair queuing",
+        "intermediate network nodes asynchronously using first-in, first-out buffering",
+        "asynchronously"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 2
+    },
+    {
+      "id": "held-out-5726509bdd62a815002e815a",
+      "question": "Who challenged the plague theory first?",
+      "expected_document": null,
+      "answers": [
+        "British bacteriologist J. F. D. Shrewsbury",
+        "J. F. D. Shrewsbury"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "06-black-death.md",
+      "withheld_paragraph": 13
+    },
+    {
+      "id": "5730876a396df9190009617b",
+      "question": " J. A. Hobson wanted which races to develop the world?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "highest 'social efficiency'",
+        "the races of highest 'social efficiency'\"",
+        "of highest 'social efficiency",
+        "races of highest 'social efficiency'\""
+      ],
+      "kind": "answerable",
+      "source_paragraph": 6
+    },
+    {
+      "id": "57284b904b864d19001648e3",
+      "question": "How many quadrangles does the Main Quadrangles have?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "six",
+        "six quadrangles"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "5726581fdd62a815002e823c",
+      "question": "What type of engines does the American car typically have?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "V8 and six cylinder engines",
+        "V8 and six cylinder"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 18
+    },
+    {
+      "id": "5725d34089a1e219009abf52",
+      "question": "What did this concept contradict ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "This concept contrasted and contradicted the theretofore established principles of pre-allocation of network bandwidth",
+        "theretofore established principles of pre-allocation of network bandwidth",
+        "principles of pre-allocation of network bandwidth"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 0
+    },
+    {
+      "id": "57265526708984140094c2be",
+      "question": "Which countries became dependent on US's security assurance to threats?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "Saudi Arabia and Iran"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 17
+    },
+    {
+      "id": "5730bb522461fd1900a9d015",
+      "question": "Who does Edward Said say is being attacked by US imperialism?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "the contemporary Orient",
+        "contemporary Orient",
+        "contemporary Orient, \""
+      ],
+      "kind": "answerable",
+      "source_paragraph": 36
+    },
+    {
+      "id": "57281edd3acd2414000df4eb",
+      "question": "What was the result of the 1967 referendum?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "voters approved the plan",
+        "governments merged to create the Consolidated City of Jacksonville"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 13
+    },
+    {
+      "id": "held-out-5726378238643c19005ad315",
+      "question": "What was suggested at the Symposium in 1967",
+      "expected_document": null,
+      "answers": [
+        "suggested it for use in the ARPANET",
+        "use in the ARPANET"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "09-packet-switching.md",
+      "withheld_paragraph": 4
+    },
+    {
+      "id": "56e1cbe2cd28a01900c67baf",
+      "question": "What would need to remain constant in a multiplication algorithm to produce the same outcome whether multiplying or squaring two integers?  ",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "input"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 30
+    },
+    {
+      "id": "57308f6b8ab72b1400f9c584",
+      "question": "The West saw themselves as what compared to the east?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "progressive",
+        "rational and progressive"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 10
+    },
+    {
+      "id": "572a03086aef0514001551a2",
+      "question": "What are the most powerful class of anti-inflammatory drugs?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "Glucocorticoids"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 33
+    },
+    {
+      "id": "56e16839cd28a01900c67889",
+      "question": "What are two basic primary resources used to guage complexity?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "time and storage"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 1
+    },
+    {
+      "id": "held-out-57286951ff5b5019007da20e",
+      "question": "What Microsoft CEO is also an alumni of the University of Chicago?",
+      "expected_document": null,
+      "answers": [
+        "Satya Nadella"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "04-university-of-chicago.md",
+      "withheld_paragraph": 27
+    },
+    {
+      "id": "57281d494b864d19001644c1",
+      "question": "What spurred increased support for government reform?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "public high schools lost their accreditation",
+        "high schools lost their accreditation"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 12
+    },
+    {
+      "id": "572643de5951261400b5195c",
+      "question": "WHat did foreign clones of DATAPAC allow for ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "A user or host could call a host on a foreign network by including the DNIC of the remote network as part of the destination address",
+        "the interconnection of national X.25 networks",
+        "interconnection of national X.25 networks"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 16
+    },
+    {
+      "id": "held-out-5730a0778ab72b1400f9c60c",
+      "question": "Humans in tropical environments were considered what?",
+      "expected_document": null,
+      "answers": [
+        "less civilized"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "07-imperialism.md",
+      "withheld_paragraph": 20
+    },
+    {
+      "id": "572a0ce11d046914007796fe",
+      "question": "What food bacteria is an example of intracellular pathogenesis?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "Salmonella"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 42
+    },
+    {
+      "id": "56e1b00ce3433e140042309f",
+      "question": "What are two factors that directly effect how powerful a Turing machine may or may not be?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "time or space"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "57286ead2ca10214002da349",
+      "question": "What was Temur Khan's Chinese-style name?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Emperor Chengzong"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "572659535951b619008f7040",
+      "question": "Name a larger car that Toyota came up with as buyers lamented the small sized compacts?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "Toyota Corona Mark II",
+        "Corona Mark II"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 19
+    },
+    {
+      "id": "572879574b864d1900164a16",
+      "question": "What religion did the Yuan discourage, to support Buddhism?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Taoism"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 23
+    },
+    {
+      "id": "5728510f4b864d1900164938",
+      "question": "The academic body of the university is made up of how many professional schools?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "seven"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 13
+    },
+    {
+      "id": "573093598ab72b1400f9c5b0",
+      "question": "Which American show changed the views of Romanians during the cold war?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "Dallas"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 13
+    },
+    {
+      "id": "57265a58dd62a815002e8273",
+      "question": "When American car companies rolled out with their domestic replacement cars, which policy ended?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "captive import policy",
+        "captive import"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 20
+    },
+    {
+      "id": "57286b003acd2414000df9c4",
+      "question": "What city later became Beijing?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Zhongdu"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "57287d4a2ca10214002da3e6",
+      "question": "Who were two of Kublai's Chinese advisers?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Liu Bingzhong and Yao Shu"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 27
+    },
+    {
+      "id": "572648d1708984140094c15f",
+      "question": "Who operated the vBSN network ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "The network was engineered and operated by MCI Telecommunications under a cooperative agreement with the NSF",
+        "MCI Telecommunications",
+        "National Science Foundation"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 22
+    },
+    {
+      "id": "5726542ff1498d1400e8dc28",
+      "question": "How much of the population in the Middle East died of the plague?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "about a third.",
+        "about a third"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 17
+    },
+    {
+      "id": "5705e26d75f01819005e76d4",
+      "question": "What is Southern California often abbreviated as?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "SoCal"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 0
+    },
+    {
+      "id": "5725b5a689a1e219009abd2b",
+      "question": "When did the Arab oil producers lift the embargo?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "March 1974",
+        "March 1974."
+      ],
+      "kind": "answerable",
+      "source_paragraph": 1
+    },
+    {
+      "id": "5730b255396df919000962b2",
+      "question": "Who asserted Russia's right to \"self-determination?\"",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "Lenin"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 30
+    },
+    {
+      "id": "5725b92e38643c19005acbd3",
+      "question": "From 1947 to 1967, how much did the price of oil increase?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "risen by less than two percent per year",
+        "less than two percent per year",
+        "by less than two percent per year"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 3
+    },
+    {
+      "id": "5730a314069b5314008321ef",
+      "question": "Who did the geographic scholars work for? ",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "colonizing empires"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 21
+    },
+    {
+      "id": "5726516a708984140094c225",
+      "question": "How much do estimations of the population during the plague vary?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "by over 100%",
+        "over 100%"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "56e1f10ee3433e1400423223",
+      "question": "Though unkown, what are the most commonly ascribed attributes of L in relation to P",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "strictly contained in P or equal to P",
+        "contained in P or equal to P."
+      ],
+      "kind": "answerable",
+      "source_paragraph": 40
+    },
+    {
+      "id": "572883153acd2414000dfa6f",
+      "question": "What Mongolian system did Kublai's government compromise with?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "patrimonial feudalism"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 40
+    },
+    {
+      "id": "held-out-57306797396df919000960f0",
+      "question": "Some have generalized the meaning of the word imperialism down to general-purpose what?",
+      "expected_document": null,
+      "answers": [
+        "aggressiveness"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "07-imperialism.md",
+      "withheld_paragraph": 2
+    },
+    {
+      "id": "572a0e4b6aef051400155217",
+      "question": "What compounds can be masked with the molecules of the host cell in order for a virus to evade detection?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "antigens"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 43
+    },
+    {
+      "id": "572856beff5b5019007da194",
+      "question": "How many volumes does the John Crerar Library roughly hold?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "more than 1.3 million",
+        "1.3 million"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 17
+    },
+    {
+      "id": "573088da069b53140083216f",
+      "question": "How would the geographical societies in Europe support certain travelers?",
+      "expected_document": "07-imperialism.md",
+      "answers": [
+        "fund",
+        "fund travelers who would come back with tales of their discoveries",
+        "fund travelers",
+        "able to fund travelers"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 7
+    },
+    {
+      "id": "held-out-5725bcb6271a42140099d0ec",
+      "question": "When did they raise the price of oil to $5.11?",
+      "expected_document": null,
+      "answers": [
+        "October 16, 1973,",
+        "October 16, 1973"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "10-1973-oil-crisis.md",
+      "withheld_paragraph": 5
+    },
+    {
+      "id": "5728fd206aef05140015494d",
+      "question": "Most antibiotics target bacteria and don't affect what class of organisms?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "fungi"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 8
+    },
+    {
+      "id": "56e1b169cd28a01900c67a73",
+      "question": "In considering Turing machines and alternate variables, what measurement left unaffected by conversion between machine models? ",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "computational power"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 15
+    },
+    {
+      "id": "5705edcd52bb8914006896cd",
+      "question": "Other than Point Conception, what landmark is used in the other definition of southern California?",
+      "expected_document": "05-southern-california.md",
+      "answers": [
+        "Tehachapi Mountains"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "57286fa83acd2414000df9e5",
+      "question": "Who was Ayurbarwada's son?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Gegeen Khan"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 16
+    },
+    {
+      "id": "57286d4f2ca10214002da329",
+      "question": "When did Kublai attack Xiangyang?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "between 1268 and 1273"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 12
+    },
+    {
+      "id": "57281940ff5b5019007d9d46",
+      "question": "Jacksonville's popularity for films earned it what title?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "Winter Film Capital of the World"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "5726487b5951b619008f6ede",
+      "question": "The UK and France had non interruptions in their oil supply as they did not allow which country to use their airfield?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "America"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 9
+    },
+    {
+      "id": "held-out-572a058aaf94a219006aa751",
+      "question": "What does a T cell extend when it encounters a foreign pathogen?",
+      "expected_document": null,
+      "answers": [
+        "a vitamin D receptor",
+        "extends a vitamin D receptor",
+        "vitamin D receptor"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "02-immune-system.md",
+      "withheld_paragraph": 35
+    },
+    {
+      "id": "572650325951b619008f6faa",
+      "question": "There is criticism that the energy policies are expensive quick fixes that ignore which facts?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "market and technology realities"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "57264e2f708984140094c1e2",
+      "question": "What was the Plos Pathogens paper about?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "a new investigation into the role of Yersinia pestis in the Black Death",
+        "role of Yersinia pestis in the Black Death",
+        "the role of Yersinia pestis in the Black Death"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 10
+    },
+    {
+      "id": "57283c464b864d19001647c8",
+      "question": "What kind of university is the University of Chicago?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "a private research university",
+        "private research",
+        "private research university"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 0
+    },
+    {
+      "id": "5729f06f1d04691400779676",
+      "question": "MHC antigens on normal body cells are recognized by what receptor on NK cells?",
+      "expected_document": "02-immune-system.md",
+      "answers": [
+        "killer cell immunoglobulin receptors (KIR",
+        "killer cell immunoglobulin",
+        "killer cell immunoglobulin receptors (KIR)"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    },
+    {
+      "id": "held-out-5729f9953f37b31900478620",
+      "question": "Female sex hormones are immunostimulators of which immune responses?",
+      "expected_document": null,
+      "answers": [
+        "adaptive and innate immune responses",
+        "both adaptive and innate"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "02-immune-system.md",
+      "withheld_paragraph": 23
+    },
+    {
+      "id": "57283f014b864d19001647e9",
+      "question": "What person helped establish the school with a donation?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "John D. Rockefeller"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 2
+    },
+    {
+      "id": "5725b33f6a3fe71400b8952e",
+      "question": "What was the price of oil in March of 1974?",
+      "expected_document": "10-1973-oil-crisis.md",
+      "answers": [
+        "nearly $12",
+        "$12"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 0
+    },
+    {
+      "id": "57264991f1498d1400e8db31",
+      "question": "Where did the residents of Antioch flee to?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "The city's residents fled to the north",
+        "the north",
+        "north"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 4
+    },
+    {
+      "id": "57280fd3ff5b5019007d9c26",
+      "question": "Who mapped the St. Johns River in 1562?",
+      "expected_document": "03-jacksonville-florida.md",
+      "answers": [
+        "Jean Ribault"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 4
+    },
+    {
+      "id": "572863363acd2414000df985",
+      "question": "In the fall quarter of 2014, how many students signed up for the college?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "5,792"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 21
+    },
+    {
+      "id": "5726385e271a42140099d797",
+      "question": "What does each packet includ in connectionless mode ",
+      "expected_document": "09-packet-switching.md",
+      "answers": [
+        "each packet includes complete addressing information",
+        "complete addressing information"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 5
+    },
+    {
+      "id": "56e17a7ccd28a01900c679a4",
+      "question": "What is another name for any given measure of input associated with a problem?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "instances",
+        "the instance",
+        "instance"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 3
+    },
+    {
+      "id": "held-out-5726241189a1e219009ac2e2",
+      "question": "How long does it take for new areas to have significant oil production?",
+      "expected_document": null,
+      "answers": [
+        "five to ten years"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "10-1973-oil-crisis.md",
+      "withheld_paragraph": 8
+    },
+    {
+      "id": "held-out-57280e1aff5b5019007d9bed",
+      "question": "Who discovered pottery found on Black Hammock Island?",
+      "expected_document": null,
+      "answers": [
+        "a University of North Florida team",
+        "University of North Florida"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "03-jacksonville-florida.md",
+      "withheld_paragraph": 3
+    },
+    {
+      "id": "56e181d9e3433e1400422fa2",
+      "question": "What is another term for the string of a problem instance?",
+      "expected_document": "01-computational-complexity-theory.md",
+      "answers": [
+        "bitstrings"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 5
+    },
+    {
+      "id": "held-out-57283db6ff5b5019007d9fc0",
+      "question": "In what year will the Barack Obama Presidential Center be finished?",
+      "expected_document": null,
+      "answers": [
+        "2020"
+      ],
+      "kind": "unanswerable",
+      "adversarial_document": "04-university-of-chicago.md",
+      "withheld_paragraph": 1
+    },
+    {
+      "id": "57265700dd62a815002e820f",
+      "question": "How many were killed by plague in Naples in 1656?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "about half of Naples' 300,000 inhabitants",
+        "half of Naples' 300,000 inhabitants"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 21
+    },
+    {
+      "id": "5728661e2ca10214002da2e8",
+      "question": "What ethnicity was Shi Tianze?",
+      "expected_document": "08-yuan-dynasty.md",
+      "answers": [
+        "Han Chinese"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 5
+    },
+    {
+      "id": "57264c42dd62a815002e80c8",
+      "question": "Who was yersinia pestis named for?",
+      "expected_document": "06-black-death.md",
+      "answers": [
+        "French-Swiss bacteriologist Alexandre Yersin",
+        "Alexandre Yersin"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 7
+    },
+    {
+      "id": "57285213ff5b5019007da183",
+      "question": "What division offers more then one branch of studies that don't fit in with the other four?",
+      "expected_document": "04-university-of-chicago.md",
+      "answers": [
+        "the New Collegiate Division",
+        "New Collegiate Division"
+      ],
+      "kind": "answerable",
+      "source_paragraph": 14
+    }
+  ]
+}
